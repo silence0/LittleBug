@@ -10,9 +10,7 @@ import time
 import xlwt
 
 
-
-
-def getDatas(month,day):
+def getDatas(year, month, day):
     basePath = r'C:\Program Files (x86)\Google\Chrome\Application'
 
     path = os.path.join(basePath, 'chromedriver.exe')
@@ -24,7 +22,7 @@ def getDatas(month,day):
     url = r'https://sellercentral.amazon.com/messaging/inbox'
     # url = r'file:///Users/djc/Downloads/Amazon.html'
     # excelUrl = r'/Users/djc/Desktop/test1.xls'
-    excelName = month + '_'+ day + '.xls'
+    excelName = str(month) + '_' + str(day) + '.xls'
     excelUrl = os.path.join('.', excelName)
 
     print('ok?')
@@ -37,7 +35,8 @@ def getDatas(month,day):
     # returnAllMessage = web.find_element_by_id('current-filter-text')
     returnAllMessage.click()
 
-    allMessage = wait.WebDriverWait(driver, 10000000).until(EC.presence_of_element_located((By.LINK_TEXT, 'All Messages')))
+    allMessage = wait.WebDriverWait(driver, 10000000).until(
+        EC.presence_of_element_located((By.LINK_TEXT, 'All Messages')))
     # allMessage = driver.find_element_by_link_text('All Messages')
     allMessage.click()
 
@@ -56,43 +55,61 @@ def getDatas(month,day):
         list = driver.find_element_by_id('threads-list')
         # time.sleep(2)
         # EC.visibility_of
-        t1 = wait.WebDriverWait(driver,10000).until(EC.presence_of_element_located((By.CSS_SELECTOR,"[class*='a-size-small thread-subject']")))
+        t1 = wait.WebDriverWait(driver, 10000).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='a-size-small thread-subject']")))
         print(t1.text)
         # time.sleep(3)
         allLetterTitleElements = list.find_elements_by_css_selector("[class*='a-size-small thread-subject']")
-        wait.WebDriverWait(driver,10000).until(EC.presence_of_element_located((By.CSS_SELECTOR,"[class*='a-size-small thread-buyername']")))
+        wait.WebDriverWait(driver, 10000).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='a-size-small thread-buyername']")))
         # time.sleep(3)
         allBuyerNameElements = list.find_elements_by_css_selector("[class*='a-size-small thread-buyername']")
-        wait.WebDriverWait(driver,10000).until(EC.presence_of_element_located((By.CSS_SELECTOR,"[class*='a-size-mini thread-timestamp']")))
+        wait.WebDriverWait(driver, 10000).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='a-size-mini thread-timestamp']")))
         # time.sleep(3)
         allBuyerDate = list.find_elements_by_css_selector("[class*='a-size-mini thread-timestamp']")
         for i, j, d in zip(allLetterTitleElements, allBuyerNameElements, allBuyerDate):
             i.click()
             buyerName = j.text
             buyerDate = d.text
+            dateObj = ''
+            selectDateObj = datetime.date(year, month, day)
             s = buyerDate.split()
-            if str[0] == month and int(str[1]) == day:
+            if ':' in buyerDate:
+                dateObj = datetime.date.today()
+            else:
+                monthDic = {'Jan': 1, 'Feb': 2,
+                            'Mar': 3, 'Apr': 4,
+                            'May': 5, 'Jun': 6,
+                            'Jul': 7, 'Aug': 8,
+                            'Sep': 9, 'Oct': 10,
+                            'Nov': 11, 'Dec': 12}
+                dateObj = datetime.date(datetime.date.today().year, monthDic[s[0]], int(s[1]))
+
+            if selectDateObj == dateObj:
                 wait.WebDriverWait(driver, 10000).until(
-                    EC.presence_of_element_located((By.ID,"currentThreadSenderId")))
+                    EC.presence_of_element_located((By.ID, "currentThreadSenderId")))
                 currentThreadSenderId = driver.find_element_by_id('currentThreadSenderId').get_attribute('value')
                 oriString = i.text
                 pattern = re.compile(r'\d*-\d*-\d*')
-                str = re.findall(pattern, oriString)
-                if len(str) != 0:
-                    getId = str[0]
+                str2 = re.findall(pattern, oriString)
+                if len(str2) != 0:
+                    getId = str2[0]
                     print(currentThreadSenderId, '         ', getId, '     ', buyerName, '      ', buyerDate)
                     sheet.write(n, 0, currentThreadSenderId)
                     sheet.write(n, 1, getId)
                     sheet.write(n, 2, buyerName)
                     sheet.write(n, 3, buyerDate)
                     n = n + 1
-            elif index>4:
+            elif dateObj < selectDateObj:
                 stop = True
                 break
-        if stop:
+
+        if stop == True:
+            book.save(excelUrl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错
+            # time.sleep(100000)
+            driver.close()
             break
-
-
         pageDiv = wait.WebDriverWait(driver, 100000).until(EC.presence_of_element_located((By.ID, 'pagination-box')))
         nextPageButton = pageDiv.find_element_by_xpath(r"//*[contains(text(),'→')]")
         nextPageButtonClass = nextPageButton.get_attribute("class")
@@ -102,27 +119,20 @@ def getDatas(month,day):
         else:
             nextPageButton.click()
             # time.sleep(2)
-        index = index+1
-        # if index == 4:
-        #     book.save(excelUrl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错
-        #     break
+        index = index + 1
 
     # 最后，将以上操作保存到指定的Excel文件中
-    book.save(excelUrl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错
-    # time.sleep(100000)
-    driver.close()
 
     return
 
-while True:
+
+if __name__ == '__main__':
     now = datetime.datetime.now()
-    date = now + datetime.timedelta(days = -1)
-    month = date.strftime("%b")
-    day = int(date.strftime("%d"))
-
-    localtime = time.localtime(time.time())
-    if localtime.tm_hour == 0 and localtime.tm_min == 0 and localtime.tm_sec == 0:
-        getDatas(month,day)
-
-
-
+    date = now + datetime.timedelta(days=-1)
+    # month = date.strftime("%b")
+    # day = int(date.strftime("%d"))
+    month = date.month
+    day = date.day
+    # localtime = time.localtime(time.time())
+    # if localtime.tm_hour == 0 and localtime.tm_min == 0 and localtime.tm_sec == 0:
+    getDatas(2018, month, day)
