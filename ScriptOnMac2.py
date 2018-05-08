@@ -3,7 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.support import wait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from datetime import *
+import datetime
 import os
 import re
 import time
@@ -54,7 +54,7 @@ def getDatas(month,day):
         buyerDate = d.text
 
         s = buyerDate.split()
-        if str[0] = month or int(str[1]) = day:
+        if str[0] == month and int(str[1]) == day:
             currentThreadSenderId = driver.find_element_by_id('currentThreadSenderId').get_attribute('value')
             oriString = i.text
             pattern = re.compile(r'\d*-\d*-\d*')
@@ -67,7 +67,7 @@ def getDatas(month,day):
                 sheet.write(n,2,buyerName)
                 n+=1
 
-        else if n>4
+        elif n>4:
             break
     # 最后，将以上操作保存到指定的Excel文件中
     book.save(excelUrl)
@@ -78,9 +78,7 @@ def getDatas(month,day):
 
 
 
-while(true):
-
-
+while True:
     now = datetime.datetime.now()
     date = now + datetime.timedelta(days = -1)
     month = date.strftime("%b")
