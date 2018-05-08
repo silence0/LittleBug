@@ -41,16 +41,29 @@ sheet.write(0, 1, 'orderId')
 sheet.write(0, 2, 'buyerName')
 sheet.write(0, 3, 'buyerDate')
 n = 1
+index = 1
 while True:
-    wait.WebDriverWait(driver, 10000).until(EC.presence_of_element_located((By.ID, 'threads-list')))
+    time.sleep(2)
+    wait.WebDriverWait(driver, 10000).until(EC.visibility_of_element_located((By.ID, 'threads-list')))
     list = driver.find_element_by_id('threads-list')
+    # time.sleep(2)
+    # EC.visibility_of
+    t1 = wait.WebDriverWait(driver,10000).until(EC.presence_of_element_located((By.CSS_SELECTOR,"[class*='a-size-small thread-subject']")))
+    print(t1.text)
+    # time.sleep(3)
     allLetterTitleElements = list.find_elements_by_css_selector("[class*='a-size-small thread-subject']")
+    wait.WebDriverWait(driver,10000).until(EC.presence_of_element_located((By.CSS_SELECTOR,"[class*='a-size-small thread-buyername']")))
+    # time.sleep(3)
     allBuyerNameElements = list.find_elements_by_css_selector("[class*='a-size-small thread-buyername']")
+    wait.WebDriverWait(driver,10000).until(EC.presence_of_element_located((By.CSS_SELECTOR,"[class*='a-size-mini thread-timestamp']")))
+    # time.sleep(3)
     allBuyerDate = list.find_elements_by_css_selector("[class*='a-size-mini thread-timestamp']")
     for i, j, d in zip(allLetterTitleElements, allBuyerNameElements, allBuyerDate):
         i.click()
         buyerName = j.text
         buyerDate = d.text
+        wait.WebDriverWait(driver, 10000).until(
+            EC.presence_of_element_located((By.ID,"currentThreadSenderId")))
         currentThreadSenderId = driver.find_element_by_id('currentThreadSenderId').get_attribute('value')
         oriString = i.text
         pattern = re.compile(r'\d*-\d*-\d*')
@@ -71,7 +84,12 @@ while True:
         break
     else:
         nextPageButton.click()
+        # time.sleep(2)
+    index = index+1
+    # if index == 4:
+    #     book.save(excelUrl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错
+    #     break
 
 # 最后，将以上操作保存到指定的Excel文件中
 book.save(excelUrl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错
-time.sleep(100000)
+# time.sleep(100000)
