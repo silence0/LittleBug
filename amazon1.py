@@ -22,7 +22,7 @@ returnAllMessage.click()
 allMessage = driver.find_element_by_link_text('All Messages')
 allMessage.click()
 
-
+wait.WebDriverWait(driver,10000).until(EC.presence_of_element_located((By.ID,'threads-list')))
 list = driver.find_element_by_id('threads-list')
 allLetterTitleElements = list.find_elements_by_css_selector("[class*='a-size-small thread-subject']")
 allBuyerNameElements = list.find_elements_by_css_selector("[class*='a-size-small thread-buyername']")
