@@ -10,7 +10,7 @@ import time
 import xlwt
 
 
-def getDatas(year, month, day):
+def getDatas(year, month, day, year2, month2, day2):
     basePath = r'C:\Program Files (x86)\Google\Chrome\Application'
 
     path = os.path.join(basePath, 'chromedriver.exe')
@@ -22,7 +22,7 @@ def getDatas(year, month, day):
     url = r'https://sellercentral.amazon.com/messaging/inbox'
     # url = r'file:///Users/djc/Downloads/Amazon.html'
     # excelUrl = r'/Users/djc/Desktop/test1.xls'
-    excelName = str(month) + '_' + str(day) + '.xls'
+    excelName = str(month) + '-' + str(day) +'to'+str(month2)+'-'+str(day2)+ '.xls'
     excelUrl = os.path.join('.', excelName)
 
     print('ok?')
@@ -48,13 +48,17 @@ def getDatas(year, month, day):
     sheet.write(0, 3, 'buyerDate')
     n = 1
     index = 1
+    dateStart = datetime.date(year,month,day)
+    dateEnd = datetime.date(year2,month2,day2)
+    selectDateObjList = []
+    for i in range(0,(dateEnd-dateStart).days+1):
+        selectDateObjList.append(dateStart+datetime.timedelta(i))
     stop = False
     while True:
         time.sleep(2)
         wait.WebDriverWait(driver, 10000).until(EC.visibility_of_element_located((By.ID, 'threads-list')))
         list = driver.find_element_by_id('threads-list')
         # time.sleep(2)
-        # EC.visibility_of
         t1 = wait.WebDriverWait(driver, 10000).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "[class*='a-size-small thread-subject']")))
         print(t1.text)
@@ -86,7 +90,7 @@ def getDatas(year, month, day):
                             'Nov': 11, 'Dec': 12}
                 dateObj = datetime.date(datetime.date.today().year, monthDic[s[0]], int(s[1]))
 
-            if selectDateObj == dateObj:
+            if dateObj in selectDateObjList:
                 wait.WebDriverWait(driver, 10000).until(
                     EC.presence_of_element_located((By.ID, "currentThreadSenderId")))
                 currentThreadSenderId = driver.find_element_by_id('currentThreadSenderId').get_attribute('value')
@@ -101,14 +105,11 @@ def getDatas(year, month, day):
                     sheet.write(n, 2, buyerName)
                     sheet.write(n, 3, buyerDate)
                     n = n + 1
-            elif dateObj < selectDateObj:
+            elif dateObj < dateStart:
                 stop = True
                 break
 
         if stop == True:
-            book.save(excelUrl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错
-            # time.sleep(100000)
-            driver.close()
             break
         pageDiv = wait.WebDriverWait(driver, 100000).until(EC.presence_of_element_located((By.ID, 'pagination-box')))
         nextPageButton = pageDiv.find_element_by_xpath(r"//*[contains(text(),'→')]")
@@ -122,9 +123,9 @@ def getDatas(year, month, day):
         index = index + 1
 
     # 最后，将以上操作保存到指定的Excel文件中
-
+    book.save(excelUrl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错
+    driver.close()
     return
-
 
 if __name__ == '__main__':
     now = datetime.datetime.now()
