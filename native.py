@@ -12,7 +12,7 @@ basePath = r'C:\Program Files (x86)\Google\Chrome\Application'
 
 path = os.path.join(basePath,'chromedriver.exe')
 cOptions = webdriver.ChromeOptions()
-# cOptions.add_argument(r'user-data-dir=C:\Users\60913\AppData\Local\Google\Chrome\User Data')
+cOptions.add_argument(r'user-data-dir=C:\Users\60913\AppData\Local\Google\Chrome\User Data')
 driver = webdriver.Chrome(executable_path=path,options=cOptions)
 
 # driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')

@@ -15,6 +15,7 @@ def getDatas(year, month, day, year2, month2, day2):
 
     path = os.path.join(basePath, 'chromedriver.exe')
     cOptions = webdriver.ChromeOptions()
+
     cOptions.add_argument(r'user-data-dir=C:\Users\pro\AppData\Local\Google\Chrome\User Data')
     driver = webdriver.Chrome(executable_path=path, options=cOptions)
 
