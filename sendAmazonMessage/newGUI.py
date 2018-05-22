@@ -92,6 +92,7 @@ class MyMainWindow(QFrame):
         self.twoPage.addWidget(self.rightFrame)
         self.mainLayout.addLayout(self.twoPage)
 
+        self.rightFrame.scheduleLabel.setText('')
     def initStyle(self):
         pass
 
@@ -99,13 +100,22 @@ class MyMainWindow(QFrame):
         self.s.graySignal.connect(self.graySlot)
         self.s.ungraySignal.connect(self.ungraySlot)
         self.s.informationSignal.connect(self.informationSlot)
-
+        self.s.errorSignal.connect(self.errorSlot)
+        self.s.scheduleSignal.connect(self.scheduleSlot)
+        self.s.addLogItemSignal.connect(self.addLogItemSlot)
+    def scheduleSlot(self,a):
+        self.rightFrame.scheduleLabel.setText(a)
     def informationSlot(self,a,b):
         QMessageBox().information(self,a,b,QMessageBox.Ok)
     def graySlot(self):
         self.leftFrame.startButton.setEnabled(False)
     def ungraySlot(self):
         self.leftFrame.startButton.setEnabled(True)
+    def errorSlot(self):
+        QMessageBox().information(self,'error','closed by accident!',QMessageBox.Ok)
+        self.s.ungraySignal.emit()
+    def addLogItemSlot(self,a):
+        self.rightFrame.logEdit.setText(a)
     def initPath(self):
         self.driverBasePath = r'C:\Program Files (x86)\Google\Chrome\Application'
         # self.driverBasePath = r'D:\userdata'
@@ -122,6 +132,11 @@ class MyMainWindow(QFrame):
         # self.getOrderListUrl = r'file:///C:/Users/60913/Desktop/4_files/2.html'
         self.getThreadUrl = r'https://sellercentral.amazon.com/messaging/inbox/ref=ag_cmin_head_xx'
         # self.driver = webdriver.Chrome(executable_path=driverPath, options=chromeOptions)
+
+    def getModelInputWidget(self):
+        return self.leftFrame.templateInput
+    def getIDInputWidget(self):
+        return self.leftFrame.IDInput
 class LeftPage(QFrame):
     def __init__(self, parent):
         super(LeftPage, self).__init__(parent)
@@ -250,8 +265,8 @@ class LeftPage(QFrame):
 
     def startClicked(self):
         if self.selectButtonBox.checkedId() == 1:
-            # self.workThread = sendByDateClickedThread(self.parent)
-            self.workThread = testThread(self.parent)
+            self.workThread = sendByDateClickedThread(self.parent)
+            # self.workThread = testThread(self.parent)
         if self.selectButtonBox.checkedId() == 2:
             self.workThread = sendByIDClickedThread(self.parent)
         if self.selectButtonBox.checkedId() == 3:
@@ -335,8 +350,10 @@ class RightPage(QScrollArea):
         }
         ''')
 
-
-app = QApplication(sys.argv)
-t = MyMainWindow()
-t.show()
-app.exec_()
+try:
+    app = QApplication(sys.argv)
+    t = MyMainWindow()
+    t.show()
+    app.exec_()
+except Exception as e:
+    print(e)
