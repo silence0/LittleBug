@@ -6,13 +6,14 @@ from selenium.webdriver.common.by import By
 import os
 import re
 import time
+import getpass
 import xlwt
 def allDateExcelGetTopInterface():
     basePath = r'C:\Program Files (x86)\Google\Chrome\Application'
 
-    path = os.path.join(basePath, 'chromedriver.exe')
+    path = os.path.join(basePath, 'bindriver.exe')
     cOptions = webdriver.ChromeOptions()
-    cOptions.add_argument(r'user-data-dir=C:\Users\pro\AppData\Local\Google\Chrome\User Data')
+    cOptions.add_argument(r'user-data-dir=C:\Users\%s\AppData\Local\Google\Chrome\User Data'%(getpass.getuser()))
     driver = webdriver.Chrome(executable_path=path, options=cOptions)
 
     # driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')
