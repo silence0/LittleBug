@@ -1,3 +1,4 @@
+import traceback
 from selenium import webdriver
 from selenium.webdriver.chrome import options
 from selenium.webdriver.support import expected_conditions as EC
@@ -16,6 +17,7 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
     while True:
         try:
             # 选择subject为order Infomation
+            print('start to send again')
             driver.get(sendMessageUrl)
             time.sleep(2)
             selectButtonWait = wait.WebDriverWait(driver,100000).until(EC.visibility_of_element_located((By.ID,'commMgrCompositionSubject')))
@@ -58,5 +60,5 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             time.sleep(3)
             print('send OK')
             return name
-        except:
-            pass
+        except Exception as e:
+            traceback.print_exc()

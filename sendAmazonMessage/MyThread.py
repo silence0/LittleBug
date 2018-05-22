@@ -5,7 +5,7 @@ from selenium import webdriver
 
 import send
 import tool
-
+import traceback
 
 
 class mySingal(QtCore.QObject):
@@ -58,7 +58,7 @@ class sendByDateClickedThread(QtCore.QThread):
                 allID.write(i + '\n')
                 allID.close()
             orderSizeStr = str(len(self.window.orderList))
-            self.window.s.scheduleSignal(str(0)+r'/'+orderSizeStr)
+            self.window.s.scheduleSignal.emit(str(0)+r'/'+orderSizeStr)
             completedIndex = 0
             for i in self.window.orderList:
                 sendUrl = send.generateSendMessageUrl(i)
@@ -70,12 +70,12 @@ class sendByDateClickedThread(QtCore.QThread):
                 completedIndex = completedIndex+1
 
                 self.window.s.addLogItemSignal.emit('Order ID:'+str(i)+'\nUser Name'+thisName)
-                self.window.s.scheduleSignal(str(completedIndex)+r'/'+orderSizeStr)
+                self.window.s.scheduleSignal.emit(str(completedIndex)+r'/'+orderSizeStr)
             self.window.driver.close()
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.ungraySignal.emit()
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             self.window.s.errorSignal.emit()
 
 
@@ -104,7 +104,7 @@ class sendByIDClickedThread(QtCore.QThread):
                 f.write(i + '\n')
                 f.close()
             orderSizeStr = str(len(self.window.orderList))
-            self.window.s.scheduleSignal(str(0) + r'/' + orderSizeStr)
+            self.window.s.scheduleSignal.emit(str(0) + r'/' + orderSizeStr)
             completedIndex = 0
             for i in allIDList:
                 if i == '':
@@ -118,13 +118,13 @@ class sendByIDClickedThread(QtCore.QThread):
                 completedIndex = completedIndex+1
 
                 self.window.s.addLogItemSignal.emit('Order ID:'+str(i)+'\nUser Name'+thisName)
-                self.window.s.scheduleSignal(str(completedIndex)+r'/'+orderSizeStr)
+                self.window.s.scheduleSignal.emit(str(completedIndex)+r'/'+orderSizeStr)
 
             self.window.driver.close()
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.ungraySignal.emit()
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             self.window.s.errorSignal.emit()
 
 
@@ -144,7 +144,7 @@ class searchClickedThread(QtCore.QThread):
             self.window.currentThreadSenderList = []
             self.window.nameList = []
             orderSizeStr = str(len(self.window.orderList))
-            self.window.s.scheduleSignal(str(0) + r'/' + orderSizeStr)
+            self.window.s.scheduleSignal.emit(str(0) + r'/' + orderSizeStr)
             completedIndex = 0
             #         拿这些ID去搜索
             self.window.driver.get(self.window.getThreadUrl)
@@ -163,7 +163,7 @@ class searchClickedThread(QtCore.QThread):
 
                 self.window.s.addLogItemSignal.emit('Order ID:' + str(i) + '\nCurrentThreadSenderID:' + str(get))
                 completedIndex = completedIndex + 1
-                self.window.s.scheduleSignal(str(completedIndex) + r'/' + orderSizeStr)
+                self.window.s.scheduleSignal.emit(str(completedIndex) + r'/' + orderSizeStr)
 
             tool.writeExcel(self.window.currentThreadSenderList, self.window.orderList, self.window.dateList)
             self.window.driver.close()
@@ -171,5 +171,5 @@ class searchClickedThread(QtCore.QThread):
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.singals.ungraySignal.emit()
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             self.window.s.errorSignal.emit()
