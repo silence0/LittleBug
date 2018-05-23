@@ -169,7 +169,7 @@ class searchClickedThread(QtCore.QThread):
             self.window.driver.close()
 
             self.window.s.informationSignal.emit('information', 'completed successfully')
-            self.window.s.singals.ungraySignal.emit()
+            self.window.s.ungraySignal.emit()
         except Exception as e:
             traceback.print_exc()
             self.window.s.errorSignal.emit()

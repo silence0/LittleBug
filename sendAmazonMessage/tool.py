@@ -62,6 +62,7 @@ def getlist(driver0):
                     thisdatetime = datetime.strptime(i + ' ' + j, "%b %d, %Y %I:%M:%S %p")
                     alldatetimelist.append(thisdatetime)
                 #     信息加入成功，那么可以离开这一页的try循环
+                # todo:这一页成功了，那么记录成功页到文件中即可
                 break
             except Exception as e:
                 traceback.print_exc()

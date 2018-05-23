@@ -17,7 +17,7 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
     while True:
         try:
             # 选择subject为order Infomation
-            print('start to send again')
+            print('start to send')
             driver.get(sendMessageUrl)
             time.sleep(2)
             selectButtonWait = wait.WebDriverWait(driver,100000).until(EC.visibility_of_element_located((By.ID,'commMgrCompositionSubject')))
@@ -50,12 +50,8 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
 
             # 点击发送邮件按钮
             wait.WebDriverWait(driver,10000).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR,'#sendemail_label')))
-            allSendMailLabel = driver.find_elements_by_css_selector('#sendemail_label')
-            for i in allSendMailLabel:
-                try:
-                    i.click()
-                except:
-                    pass
+            allSendMailLabel = driver.find_elements_by_css_selector('#sendemail')
+            allSendMailLabel[1].click()
             # 点了发送休息2S
             time.sleep(3)
             print('send OK')
