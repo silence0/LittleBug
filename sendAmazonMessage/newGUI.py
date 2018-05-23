@@ -1,4 +1,5 @@
 import getpass
+import traceback
 import os
 import sys
 
@@ -356,4 +357,4 @@ try:
     t.show()
     app.exec_()
 except Exception as e:
-    print(e)
+    traceback.print_exc()

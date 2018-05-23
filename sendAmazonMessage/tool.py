@@ -7,7 +7,7 @@ import time
 import xlwt
 import os
 from datetime import datetime
-
+import traceback
 
 # 获取所有的打开页面的orderlist 和 datetimelist，但是检索要自己进行
 
@@ -28,7 +28,7 @@ def getlist(driver0):
                 if int(currentpagination1) == int(currentpagination) + 1:
                     break
             except Exception as e:
-                print(e)
+                traceback.print_exc()
                 pass
 
         # 匹配
@@ -62,9 +62,10 @@ def getlist(driver0):
                     thisdatetime = datetime.strptime(i + ' ' + j, "%b %d, %Y %I:%M:%S %p")
                     alldatetimelist.append(thisdatetime)
                 #     信息加入成功，那么可以离开这一页的try循环
+                # todo:这一页成功了，那么记录成功页到文件中即可
                 break
             except Exception as e:
-                print(e)
+                traceback.print_exc()
                 pass
 
         # 翻页
@@ -75,11 +76,10 @@ def getlist(driver0):
             nextpagebutton.click()
             print("next")
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             print("finish")
             break
     print("``````````````")
-    print(alldatetimelist)
     return allorderlist, alldatetimelist, allOrderNameList
 
 
@@ -98,7 +98,7 @@ def getcurrent(driver0, orderid):
             # 只有不出现任何问题，才能继续，否则重新来一遍
             break
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             pass
     try:
         # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
@@ -108,7 +108,7 @@ def getcurrent(driver0, orderid):
         current = driver0.find_element_by_id('currentThreadSenderId').get_attribute('value')
         return current
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         return None
 
 
