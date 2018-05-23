@@ -17,13 +17,24 @@ def getlist(driver0):
     alldatetimelist = []
     allOrderNameList = []
     currentpagination = 0
+    onepageflag = 0
     while True:
         while True:
             # 获取当前页数的循环，如果发生了不可预知的错误，那么重新进行
             try:
                 time.sleep(2)
-                wait.WebDriverWait(driver0, 10000000).until(
+                orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
+                if currentpagination == 0:
+                    pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
+                    pagefulltext = re.findall(pattern11, orderlisthtml.text)
+                    pagetext = str(pagefulltext[0])
+                    maxnum = pagetext.split()[-1]
+                    if int(maxnum) <= 15:
+                        onepageflag = 1;
+                        print('onegage!')
+                        break
+
                 currentpagination1 = driver0.find_element_by_xpath("//strong[@class = 'currentpagination']").text
                 if int(currentpagination1) == int(currentpagination) + 1:
                     break
@@ -69,6 +80,8 @@ def getlist(driver0):
                 pass
 
         # 翻页
+        if onepageflag == 1:
+            break
 
         try:
             nextpagebutton = driver0.find_element_by_xpath("//a[text()='Next' and @class = 'myo_list_orders_link']")

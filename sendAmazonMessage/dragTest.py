@@ -15,7 +15,7 @@ class MyWindow(QFrame):
             print(456)
     def mouseMoveEvent(self, event:QMouseEvent):
         if self.drag == True:
-            self.move(event.globalPos()-event.)
+            self.move(event.globalPos()-event)
 
 
 app = QApplication(sys.argv)
