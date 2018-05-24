@@ -31,7 +31,11 @@ def getlist(driver0):
                     pagetext = str(pagefulltext[0])
                     maxnum = pagetext.split()[-1]
                     if int(maxnum) <= 15:
+<<<<<<< HEAD
                         onepageflag = 1;
+=======
+                        onepageflag = 1
+>>>>>>> 0c759a086666e0a157be676d34ebdd67d55f418a
                         print('onegage!')
                         break
 
@@ -40,7 +44,7 @@ def getlist(driver0):
                     break
             except Exception as e:
                 traceback.print_exc()
-                pass
+                print('try again---------------------------------')
 
         # 匹配
         while True:
@@ -77,7 +81,7 @@ def getlist(driver0):
                 break
             except Exception as e:
                 traceback.print_exc()
-                pass
+                print('try again----------------------------')
 
         # 翻页
         if onepageflag == 1:
@@ -89,10 +93,9 @@ def getlist(driver0):
             nextpagebutton.click()
             print("next")
         except Exception as e:
-            traceback.print_exc()
-            print("finish")
+            # traceback.print_exc()
+            print("finish to get orderID---------------------")
             break
-    print("``````````````")
     return allorderlist, alldatetimelist, allOrderNameList
 
 
@@ -104,15 +107,17 @@ def getcurrent(driver0, orderid):
             wait.WebDriverWait(driver0, 5).until(
                 EC.presence_of_element_located((By.ID, 'search-text-box')))
             idinput = driver0.find_element_by_id("search-text-box")
-            idinput.clear()
-            idinput.send_keys(orderid)
             searchbutton = driver0.find_element_by_name("Search")
-            searchbutton.click()
+            # idinput.clear()
+            # idinput.send_keys(orderid)
+            driver0.execute_script("arguments[0].value=" + "'" + orderid + "'", idinput)
+            driver0.execute_script('arguments[0].click();', searchbutton)
+            # searchbutton.click()
             # 只有不出现任何问题，才能继续，否则重新来一遍
             break
         except Exception as e:
             traceback.print_exc()
-            pass
+            print('try again--------------------')
     try:
         # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
         time.sleep(2)
@@ -121,7 +126,8 @@ def getcurrent(driver0, orderid):
         current = driver0.find_element_by_id('currentThreadSenderId').get_attribute('value')
         return current
     except Exception as e:
-        traceback.print_exc()
+        # traceback.print_exc()
+        print('No result found, ready to send message')
         return None
 
 
