@@ -118,21 +118,19 @@ class MyMainWindow(QFrame):
     def addLogItemSlot(self,a):
         self.rightFrame.logEdit.setText(a)
     def initPath(self):
-        self.driverBasePath = r'C:\Program Files (x86)\Google\Chrome\Application'
+        self.driverBasePath = r'C:\Program Files (x86)\Mozilla Firefox'
         # self.driverBasePath = r'D:\userdata'
-        self.driverPath = os.path.join(self.driverBasePath, 'bindriver.exe')
+        self.driverPath = os.path.join(self.driverBasePath, 'geckodriver.exe')
 
-        userDatePath = r'C:\Users\%s\AppData\Local\Google\Chrome\User Data' % (getpass.getuser())
+        # userDatePath = r'C:\Users\%s\AppData\Local\Google\Chrome\User Data' % (getpass.getuser())
+        lastUserDataPath = r'C:\Users\%s\AppData\Local\Mozilla\Firefox\Profiles'%getpass.getuser()
+        t = os.listdir(lastUserDataPath)
+        fileName = t[0]
+        userDatePath = os.path.join(lastUserDataPath,fileName)
+        self.firefoxProfile = webdriver.FirefoxProfile(userDatePath)
 
-        # userDatePath = r'D:\userdata'
-        self.chromeOptions = webdriver.ChromeOptions()
-        self.chromeOptions.add_argument(r'user-data-dir=' + userDatePath)
-
-        # self.sendMessageUrl = r'file:///C:/Users/60913/Desktop/4_files/6.html'
         self.selectDateUrl = r'https://sellercentral.amazon.com/gp/orders-v2/search/ref=ag_myosearch_apsearch_myo'
-        # self.getOrderListUrl = r'file:///C:/Users/60913/Desktop/4_files/2.html'
         self.getThreadUrl = r'https://sellercentral.amazon.com/messaging/inbox/ref=ag_cmin_head_xx'
-        # self.driver = webdriver.Chrome(executable_path=driverPath, options=chromeOptions)
 
     def getModelInputWidget(self):
         return self.leftFrame.templateInput

@@ -7,7 +7,6 @@ __pycache__/
 
 # C extensions
 *.so
-
 # Distribution / packaging
 .Python
 build/
@@ -112,3 +111,9 @@ venv.bak/
 *.iml
 out
 gen
+sendAmazonMessage/native.py
+sendAmazonMessage/nativeTool.py
+sendAmazonMessage/setup.py
+sendAmazonMessage/test1.py
+sendAmazonMessage/tooltest.py
+test2.py
