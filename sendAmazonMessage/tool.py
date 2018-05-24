@@ -31,11 +31,7 @@ def getlist(driver0):
                     pagetext = str(pagefulltext[0])
                     maxnum = pagetext.split()[-1]
                     if int(maxnum) <= 15:
-<<<<<<< HEAD
-                        onepageflag = 1;
-=======
                         onepageflag = 1
->>>>>>> 0c759a086666e0a157be676d34ebdd67d55f418a
                         print('onegage!')
                         break
 
