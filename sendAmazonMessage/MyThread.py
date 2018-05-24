@@ -38,6 +38,7 @@ class sendByDateClickedThread(QtCore.QThread):
         try:
             self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
                                                   options=self.window.chromeOptions)
+            self.window.setDriver(self.window.driver)
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
             # 先把之前生成的发送情况给清除掉
             t = open('allID.txt', 'w')
@@ -88,6 +89,8 @@ class sendByIDClickedThread(QtCore.QThread):
         try:
             self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
                                                   options=self.window.chromeOptions)
+            self.window.setDriver(self.window.driver)
+
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
             self.window.nameList = []
             allID = self.window.getIDInputWidget().toPlainText()
@@ -138,6 +141,7 @@ class searchClickedThread(QtCore.QThread):
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
             self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
                                                   options=self.window.chromeOptions)
+            self.window.setDriver(self.window.driver)
             self.window.driver.get(self.window.selectDateUrl)
             time.sleep(3)
             self.window.orderList, self.window.dateList, self.window.orderNameList = tool.getlist(self.window.driver)

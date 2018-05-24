@@ -7,7 +7,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from selenium import webdriver
 
-from MyThread import searchClickedThread, sendByIDClickedThread, sendByDateClickedThread, mySingal,testThread
+from MyThread import searchClickedThread, sendByIDClickedThread, sendByDateClickedThread, mySingal, testThread
 
 
 class Header(QFrame):
@@ -74,6 +74,9 @@ class MyMainWindow(QFrame):
         self.initAsySignal()
         self.initPath()
 
+    def setDriver(self, d):
+        self.driver = d
+
     def initUI(self):
         # self.resize(500,500)
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -94,6 +97,7 @@ class MyMainWindow(QFrame):
         self.mainLayout.addLayout(self.twoPage)
 
         self.rightFrame.scheduleLabel.setText('')
+
     def initStyle(self):
         pass
 
@@ -104,19 +108,26 @@ class MyMainWindow(QFrame):
         self.s.errorSignal.connect(self.errorSlot)
         self.s.scheduleSignal.connect(self.scheduleSlot)
         self.s.addLogItemSignal.connect(self.addLogItemSlot)
-    def scheduleSlot(self,a):
+
+    def scheduleSlot(self, a):
         self.rightFrame.scheduleLabel.setText(a)
-    def informationSlot(self,a,b):
-        QMessageBox().information(self,a,b,QMessageBox.Ok)
+
+    def informationSlot(self, a, b):
+        QMessageBox().information(self, a, b, QMessageBox.Ok)
+
     def graySlot(self):
         self.leftFrame.startButton.setEnabled(False)
+
     def ungraySlot(self):
         self.leftFrame.startButton.setEnabled(True)
+
     def errorSlot(self):
-        QMessageBox().information(self,'error','closed by accident!',QMessageBox.Ok)
+        QMessageBox().information(self, 'error', 'closed by accident!', QMessageBox.Ok)
         self.s.ungraySignal.emit()
-    def addLogItemSlot(self,a):
+
+    def addLogItemSlot(self, a):
         self.rightFrame.logEdit.setText(a)
+
     def initPath(self):
         self.driverBasePath = r'C:\Program Files (x86)\Google\Chrome\Application'
         # self.driverBasePath = r'D:\userdata'
@@ -136,8 +147,11 @@ class MyMainWindow(QFrame):
 
     def getModelInputWidget(self):
         return self.leftFrame.templateInput
+
     def getIDInputWidget(self):
         return self.leftFrame.IDInput
+
+
 class LeftPage(QFrame):
     def __init__(self, parent):
         super(LeftPage, self).__init__(parent)
@@ -148,7 +162,7 @@ class LeftPage(QFrame):
         self.initSize()
         self.initStyle()
         self.tempVar = 1
-        self.browserShow = True
+        self.browserShowFlag = True
         self.setObjectName('baseWindow')
 
     def initUI(self):
@@ -174,7 +188,6 @@ class LeftPage(QFrame):
 
         self.startButton = QPushButton('Start')
         self.showLogButton = QPushButton('ShowLog')
-        self.showBrowser = QPushButton('Browser')
         self.mainLayout.addSpacing(20)
         self.mainLayout.addWidget(self.templateInput)
         self.mainLayout.addSpacing(20)
@@ -190,9 +203,10 @@ class LeftPage(QFrame):
         self.mainLayout.addWidget(self.IDInput)
         self.mainLayout.addSpacing(20)
         self.tempH2Box = QHBoxLayout()
+        self.hideBrowserButton = QPushButton('HideBrowser')
         self.tempH2Box.addWidget(self.startButton)
+        self.tempH2Box.addWidget(self.hideBrowserButton)
         self.tempH2Box.addWidget(self.showLogButton)
-        # self.tempH2Box.addWidget(self.showBrowser)
         # self.mainLayout.addWidget(self.startButton)
         self.mainLayout.addLayout(self.tempH2Box)
         self.mainLayout.addSpacing(20)
@@ -255,6 +269,7 @@ class LeftPage(QFrame):
     def buttonConnect(self):
         self.showLogButton.clicked.connect(self.hideRightPage)
         self.startButton.clicked.connect(self.startClicked)
+        self.hideBrowserButton.clicked.connect(self.hideBrowser)
 
     def hideRightPage(self):
         if self.tempVar == 1:
@@ -266,13 +281,22 @@ class LeftPage(QFrame):
             self.parentWidget().rightFrame.show()
             self.parentWidget().setFixedWidth(1000)
             self.tempVar = 1
-    # def hideBrowser(self):
-    #     if self.browserShow == True:
-    #         self.browserShow = False
-    #         assert isinstance(self.parent.driver,webdriver.Chrome)
-    #         self.parent.driver
-    #     else:
-    #         self.browserShow = True
+
+    def hideBrowser(self):
+        try:
+            if self.browserShowFlag == True:
+                self.parent.driver.set_window_position(-2000, 0)
+                # self.parent.driver.maximize_window()
+                self.parent.driver.set_window_size(1000, 1000)
+                self.browserShowFlag = False
+
+            elif self.browserShowFlag == False:
+                self.parent.driver.set_window_position(0, 0)
+                self.parent.driver.maximize_window()
+                self.browserShowFlag = True
+        except:
+            traceback.print_exc()
+            print('browser page wrong!')
 
     def startClicked(self):
         if self.selectButtonBox.checkedId() == 1:
@@ -284,6 +308,7 @@ class LeftPage(QFrame):
             self.workThread = searchClickedThread(self.parent)
         self.workThread.start()
         self.parentWidget().s.graySignal.emit()
+
 
 class RightPage(QScrollArea):
     def __init__(self, parent):
@@ -347,7 +372,7 @@ class RightPage(QScrollArea):
         }
         QLabel
         {
-            
+
         }
         *#baseWindow{
             background-color:white;
@@ -360,6 +385,7 @@ class RightPage(QScrollArea):
             color:blue;
         }
         ''')
+
 
 try:
     app = QApplication(sys.argv)
