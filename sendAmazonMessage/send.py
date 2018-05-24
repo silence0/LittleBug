@@ -37,24 +37,32 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             patternUsername = re.compile(r'#username')
             modelStr = re.sub(patternOrderid,orderid,modelStr)
             modelStr = re.sub(patternUsername,name,modelStr)
-
+            modelStr = '%r'%modelStr
+            modelStr = modelStr[1:-1]
             # 发送的内容
             # modelStr = 'dear '+name+':\n'+modelStr
             wait.WebDriverWait(driver,100000).until(EC.visibility_of_element_located((By.ID,'commMgrCompositionMessage')))
             textArea = driver.find_element_by_id('commMgrCompositionMessage')
-            chunkModel = iterutils.chunked(modelStr,100)
-            for i in chunkModel:
-                textArea.send_keys(i)
+            driver.execute_script("arguments[0].value="+"'"+modelStr+"';",textArea)
+            time.sleep(1)
+
+            # chunkModel = iterutils.chunked(modelStr,100)
+            # for i in chunkModel:
+            #     textArea.send_keys(i)
+
 
             # textArea.send_keys(modelStr)
 
             # 点击发送邮件按钮
             wait.WebDriverWait(driver,10000).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR,'#sendemail_label')))
             allSendMailLabel = driver.find_elements_by_css_selector('#sendemail')
-            allSendMailLabel[1].click()
+            allSendMailLabel = allSendMailLabel[1]
+            driver.execute_script("arguments[0].click();", allSendMailLabel)
+
             # 点了发送休息2S
             time.sleep(3)
             print('send OK')
             return name
         except Exception as e:
             traceback.print_exc()
+            print('try send again----------------------')

@@ -148,6 +148,7 @@ class LeftPage(QFrame):
         self.initSize()
         self.initStyle()
         self.tempVar = 1
+        self.browserShow = True
         self.setObjectName('baseWindow')
 
     def initUI(self):
@@ -173,6 +174,7 @@ class LeftPage(QFrame):
 
         self.startButton = QPushButton('Start')
         self.showLogButton = QPushButton('ShowLog')
+        self.showBrowser = QPushButton('Browser')
         self.mainLayout.addSpacing(20)
         self.mainLayout.addWidget(self.templateInput)
         self.mainLayout.addSpacing(20)
@@ -190,6 +192,7 @@ class LeftPage(QFrame):
         self.tempH2Box = QHBoxLayout()
         self.tempH2Box.addWidget(self.startButton)
         self.tempH2Box.addWidget(self.showLogButton)
+        # self.tempH2Box.addWidget(self.showBrowser)
         # self.mainLayout.addWidget(self.startButton)
         self.mainLayout.addLayout(self.tempH2Box)
         self.mainLayout.addSpacing(20)
@@ -263,6 +266,13 @@ class LeftPage(QFrame):
             self.parentWidget().rightFrame.show()
             self.parentWidget().setFixedWidth(1000)
             self.tempVar = 1
+    # def hideBrowser(self):
+    #     if self.browserShow == True:
+    #         self.browserShow = False
+    #         assert isinstance(self.parent.driver,webdriver.Chrome)
+    #         self.parent.driver
+    #     else:
+    #         self.browserShow = True
 
     def startClicked(self):
         if self.selectButtonBox.checkedId() == 1:
