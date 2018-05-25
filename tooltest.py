@@ -91,9 +91,77 @@ driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')
 
 print('ok?')
 driver.get(url)
-AllOrderList, Alldatetimelist = getlist(driver)
+# AllOrderList, Alldatetimelist = getlist(driver)
 
 
-str1 = 'May 9, 2018 4:04:55 PM'
-dt = datetime.strptime(str1, "%b %d, %Y %I:%M:%S %p")
-print(dt)
+
+
+
+
+
+# str1 = 'May 9, 2018 4:04:55 PM'
+# dt = datetime.strptime(str1, "%b %d, %Y %I:%M:%S %p")
+# print(dt)
+# orderlisthtml = wait.WebDriverWait(driver, 10000000).until(EC.presence_of_element_located((By.ID, 'myo-table')))
+
+# pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
+# pagefulltext = re.findall(pattern11, orderlisthtml.text)
+# pagetext = str(pagefulltext[0])
+# maxnum = pagetext.split()[-1]
+
+# orderinfo = driver.find_elements_by_xpath("//span[contains(@id,'___product')]")
+# info_a = driver.find_element_by_xpath("//a[contains(@href,'orderId=111-2389060-6443420')]")
+# info_a = driver.find_element_by_link_text("111-2389060-6443420")
+# print(info_a)
+# info_a.click()
+#
+# for i in orderinfo:
+#     print("i: " + i.text)
+
+
+
+
+
+def getorderinfo(driver0,orderid):
+    orderrow = driver.find_element_by_id("row-"+orderid)
+    orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
+    o1 = orderinfo.text
+    if(str(orderinfo.text)[-3:] == '...'):
+        info_a = orderrow.find_element_by_link_text(orderid)
+        js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
+        handle = driver0.current_window_handle
+        driver0.execute_script(js)
+
+        handles = driver0.window_handles
+        for newhandle in handles:
+
+            # 筛选新打开的窗口B
+
+            if newhandle != handle:
+
+        # 切换到新打开的窗口B
+
+                driver0.switch_to_window(newhandle)
+
+        # 在新打开的窗口B中操作
+        wait.WebDriverWait(driver0, 10000000).until(
+            EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
+        o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+
+        # 关闭当前窗口B
+
+        driver0.close()
+
+        # 切换回窗口A
+
+        driver0.switch_to_window(handles[0])
+
+    return o1
+
+
+print(getorderinfo(driver, '112-7159011-6004236'))
+
+
+
+
+# print(orderlisthtml.text)

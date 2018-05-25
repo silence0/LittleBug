@@ -10,6 +10,7 @@ import time
 import xlwt
 import getpass
 
+
 def getDatas(year, month, day, year2, month2, day2):
     basePath = r'C:\Program Files (x86)\Google\Chrome\Application'
 
@@ -115,6 +116,7 @@ def getDatas(year, month, day, year2, month2, day2):
         pageDiv = wait.WebDriverWait(driver, 100000).until(EC.presence_of_element_located((By.ID, 'pagination-box')))
         nextPageButton = pageDiv.find_element_by_xpath(r"//*[contains(text(),'→')]")
         nextPageButtonClass = nextPageButton.get_attribute("class")
+
         print(nextPageButtonClass)
         if nextPageButtonClass == 'a-disabled a-last':
             break
