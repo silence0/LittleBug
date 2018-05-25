@@ -38,12 +38,11 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             modelStr = re.sub(patternOrderid,orderid,modelStr)
             modelStr = re.sub(patternUsername,name,modelStr)
             modelStr = '%r'%modelStr
-            modelStr = modelStr[1:-1]
             # 发送的内容
             # modelStr = 'dear '+name+':\n'+modelStr
             wait.WebDriverWait(driver,100000).until(EC.visibility_of_element_located((By.ID,'commMgrCompositionMessage')))
             textArea = driver.find_element_by_id('commMgrCompositionMessage')
-            driver.execute_script("arguments[0].value="+"'"+modelStr+"';",textArea)
+            driver.execute_script("arguments[0].value="+modelStr+";",textArea)
             time.sleep(1)
 
             # chunkModel = iterutils.chunked(modelStr,100)
