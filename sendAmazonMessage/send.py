@@ -67,7 +67,8 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             driver.execute_script("arguments[0].click();", allSendMailLabel)
 
             # 点了发送休息2S
-            time.sleep(3)
+            # time.sleep(3)
+            wait.WebDriverWait(driver, 100).until(EC.presence_of_element_located((By.NAME, 'Back to Manage Orders')))
             print('send OK')
             return name
         except Exception as e:
