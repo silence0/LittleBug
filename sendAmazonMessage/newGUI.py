@@ -44,8 +44,15 @@ class Header(QFrame):
 
     def initConnect(self):
         self.miniBUtton.clicked.connect(self.parentWidget().showMinimized)
-        self.closeButton.clicked.connect(self.parentWidget().close)
+        self.closeButton.clicked.connect(self.myClose)
 
+    def myClose(self):
+        t = QMessageBox().warning(self.parentWidget(),'warning!!!','Are you sure to close?',QMessageBox.Ok|QMessageBox.Cancel)
+        if t == QMessageBox.Ok:
+            self.parentWidget().close()
+        if t== QMessageBox.Cancel:
+            return
+        
     def mousePressEvent(self, event):
         if event.buttons() == Qt.LeftButton:
             self.parent.m_drag = True
