@@ -6,6 +6,7 @@ import time
 from selenium.webdriver.support import wait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+import tool
 import os.path
 from boltons import iterutils
 
@@ -32,11 +33,18 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             t = re.search(p, name)
             name = t.group(1)
 
+            # 获取订单详情
+            productname = driver.find_element_by_css_selector("[style='list-style-position:inside; padding-left:0; margin-left:0']").text
+            if len(productname) > 80:
+                productname = tool.getorderinfo2(driver,orderid)
+
             # 对model进行智能处理
             patternOrderid = re.compile(r'#orderid')
             patternUsername = re.compile(r'#username')
+            patternProductname = re.compile(r'#productname')
             modelStr = re.sub(patternOrderid,orderid,modelStr)
             modelStr = re.sub(patternUsername,name,modelStr)
+            modelStr = re.sub(patternProductname,productname,modelStr)
             modelStr = '%r'%modelStr
             modelStr = modelStr[1:-1]
             # 发送的内容
