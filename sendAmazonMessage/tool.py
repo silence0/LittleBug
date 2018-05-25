@@ -11,6 +11,7 @@ import traceback
 
 # 获取所有的打开页面的orderlist 和 datetimelist，但是检索要自己进行
 
+
 def getorderinfo(driver0,orderid):
     orderrow = driver0.find_element_by_id("row-"+orderid)
     orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
@@ -84,7 +85,7 @@ def getorderinfo2(driver0,orderid):
 def getlist(driver0):
     allorderlist = []
     alldatetimelist = []
-    allorderinfolist = []
+    # allorderinfolist = []
     currentpagination = 0
     onepageflag = 0
     while True:
@@ -119,7 +120,7 @@ def getlist(driver0):
                 pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
                 orderlist = re.findall(pattern, orderlisthtml.text)
 
-                orderinfolist = []
+                # orderinfolist = []
 
                 datelist = []
                 timelist = []
@@ -132,13 +133,13 @@ def getlist(driver0):
                     pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
                     thistime = re.findall(pattern2, currentordertable.text)
                     timelist.append(thistime[0])
-
-                    orderinfolist.append(getorderinfo(driver0,i))
+                    #
+                    # orderinfolist.append(getorderinfo(driver0,i))
 
                 #     把这一页的信息加入
                 allorderlist.extend(orderlist)
-                print(orderinfolist)
-                allorderinfolist.extend(orderinfolist)
+                # print(orderinfolist)
+                # allorderinfolist.extend(orderinfolist)
                 for i, j in zip(datelist, timelist):
                     # print('test:    '+i+'    '+j)
                     thisdatetime = datetime.strptime(i + ' ' + j, "%b %d, %Y %I:%M:%S %p")
@@ -163,7 +164,7 @@ def getlist(driver0):
             # traceback.print_exc()
             print("finish to get orderID---------------------")
             break
-    return allorderlist, alldatetimelist, allorderinfolist
+    return allorderlist, alldatetimelist
 
 
 # 尝试获取currentThreadSenderID，如果获取失败，那么返回的是none

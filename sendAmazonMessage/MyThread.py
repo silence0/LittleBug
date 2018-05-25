@@ -49,7 +49,7 @@ class sendByDateClickedThread(QtCore.QThread):
 
             # 获取orderid,并创建各种list
             self.window.driver.get(self.window.selectDateUrl)
-            self.window.orderList, self.window.dateList, self.window.orderNameList = tool.getlist(self.window.driver)
+            self.window.orderList, self.window.dateList = tool.getlist(self.window.driver)
             self.window.currentThreadSenderList = []
             self.window.nameList = []
 
@@ -144,7 +144,7 @@ class searchClickedThread(QtCore.QThread):
             self.window.setDriver(self.window.driver)
             self.window.driver.get(self.window.selectDateUrl)
             time.sleep(3)
-            self.window.orderList, self.window.dateList, self.window.orderNameList = tool.getlist(self.window.driver)
+            self.window.orderList, self.window.dateList = tool.getlist(self.window.driver)
             self.window.currentThreadSenderList = []
             self.window.nameList = []
             orderSizeStr = str(len(self.window.orderList))
