@@ -112,3 +112,7 @@ venv.bak/
 *.iml
 out
 gen
+
+# testfile
+tooltest.py
+setup.py

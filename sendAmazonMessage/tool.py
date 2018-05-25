@@ -1,0 +1,234 @@
+from selenium import webdriver
+from selenium.webdriver.support import wait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import re
+import time
+import xlwt
+import os
+from datetime import datetime
+import traceback
+
+# 获取所有的打开页面的orderlist 和 datetimelist，但是检索要自己进行
+
+def getorderinfo(driver0,orderid):
+    orderrow = driver0.find_element_by_id("row-"+orderid)
+    orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
+    o1 = orderinfo.text
+    if(str(orderinfo.text)[-3:] == '...'):
+        info_a = orderrow.find_element_by_link_text(orderid)
+        js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
+        handle = driver0.current_window_handle
+        driver0.execute_script(js)
+
+        handles = driver0.window_handles
+        for newhandle in handles:
+
+            # 筛选新打开的窗口B
+
+            if newhandle != handle:
+
+        # 切换到新打开的窗口B
+
+                driver0.switch_to_window(newhandle)
+
+        # 在新打开的窗口B中操作
+        wait.WebDriverWait(driver0, 10000000).until(
+            EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
+        o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+
+        # 关闭当前窗口B
+
+        driver0.close()
+
+        # 切换回窗口A
+
+        driver0.switch_to_window(handles[0])
+
+    return o1
+
+
+def getorderinfo2(driver0,orderid):
+
+    js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
+    handle = driver0.current_window_handle
+    driver0.execute_script(js)
+
+    handles = driver0.window_handles
+    for newhandle in handles:
+
+        # 筛选新打开的窗口B
+
+        if newhandle != handle:
+
+    # 切换到新打开的窗口B
+
+            driver0.switch_to_window(newhandle)
+
+    # 在新打开的窗口B中操作
+    wait.WebDriverWait(driver0, 10000000).until(
+        EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
+    o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+
+    # 关闭当前窗口B
+
+    driver0.close()
+
+    # 切换回窗口A
+
+    driver0.switch_to_window(handles[0])
+
+    return o1
+
+
+def getlist(driver0):
+    allorderlist = []
+    alldatetimelist = []
+    allorderinfolist = []
+    currentpagination = 0
+    onepageflag = 0
+    while True:
+        while True:
+            # 获取当前页数的循环，如果发生了不可预知的错误，那么重新进行
+            try:
+                time.sleep(2)
+                orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
+                    EC.presence_of_element_located((By.ID, 'myo-table')))
+                if currentpagination == 0:
+                    pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
+                    pagefulltext = re.findall(pattern11, orderlisthtml.text)
+                    pagetext = str(pagefulltext[0])
+                    maxnum = pagetext.split()[-1]
+                    if int(maxnum) <= 15:
+                        onepageflag = 1
+                        print('onegage!')
+                        break
+
+                currentpagination1 = driver0.find_element_by_xpath("//strong[@class = 'currentpagination']").text
+                if int(currentpagination1) == int(currentpagination) + 1:
+                    break
+            except Exception as e:
+                traceback.print_exc()
+                print('try again---------------------------------')
+
+        # 匹配
+        while True:
+            try:
+                orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
+                    EC.presence_of_element_located((By.ID, 'myo-table')))
+                pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
+                orderlist = re.findall(pattern, orderlisthtml.text)
+
+                orderinfolist = []
+
+                datelist = []
+                timelist = []
+                for i in orderlist:
+                    currentordertable = driver0.find_element_by_id('row-' + i)
+                    pattern1 = re.compile(r'\w{3} \d{1,2}, \d{4}')
+                    thisdate = re.findall(pattern1, currentordertable.text)
+                    datelist.append(thisdate[0])
+
+                    pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
+                    thistime = re.findall(pattern2, currentordertable.text)
+                    timelist.append(thistime[0])
+
+                    orderinfolist.append(getorderinfo(driver0,i))
+
+                #     把这一页的信息加入
+                allorderlist.extend(orderlist)
+                print(orderinfolist)
+                allorderinfolist.extend(orderinfolist)
+                for i, j in zip(datelist, timelist):
+                    # print('test:    '+i+'    '+j)
+                    thisdatetime = datetime.strptime(i + ' ' + j, "%b %d, %Y %I:%M:%S %p")
+                    alldatetimelist.append(thisdatetime)
+                #     信息加入成功，那么可以离开这一页的try循环
+                # todo:这一页成功了，那么记录成功页到文件中即可
+                break
+            except Exception as e:
+                traceback.print_exc()
+                print('try again----------------------------')
+
+        # 翻页
+        if onepageflag == 1:
+            break
+
+        try:
+            nextpagebutton = driver0.find_element_by_xpath("//a[text()='Next' and @class = 'myo_list_orders_link']")
+            currentpagination = driver0.find_element_by_xpath("//strong[@class = 'currentpagination']").text
+            nextpagebutton.click()
+            print("next")
+        except Exception as e:
+            # traceback.print_exc()
+            print("finish to get orderID---------------------")
+            break
+    return allorderlist, alldatetimelist, allorderinfolist
+
+
+# 尝试获取currentThreadSenderID，如果获取失败，那么返回的是none
+def getcurrent(driver0, orderid):
+    while True:
+        try:
+            time.sleep(2)
+            wait.WebDriverWait(driver0, 5).until(
+                EC.presence_of_element_located((By.ID, 'search-text-box')))
+            idinput = driver0.find_element_by_id("search-text-box")
+            searchbutton = driver0.find_element_by_name("Search")
+            # idinput.clear()
+            # idinput.send_keys(orderid)
+            driver0.execute_script("arguments[0].value=" + "'" + orderid + "'", idinput)
+            driver0.execute_script('arguments[0].click();', searchbutton)
+            # searchbutton.click()
+            # 只有不出现任何问题，才能继续，否则重新来一遍
+            break
+        except Exception as e:
+            traceback.print_exc()
+            print('try again--------------------')
+    try:
+        # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
+        time.sleep(2)
+        wait.WebDriverWait(driver0, 3).until(
+            EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+        current = driver0.find_element_by_id('currentThreadSenderId').get_attribute('value')
+        return current
+    except Exception as e:
+        # traceback.print_exc()
+        print('No result found, ready to send message')
+        return None
+
+
+def writeExcel(current, order, dateList):
+    # excelname = str(month) + '-' + str(day) + 'to' + str(month2) + '-' + str(day2) + '.xls'
+    # excelName = 'result.xls'
+    # try:
+    #     firstDay = dateList[0]
+    #     lastDay = dateList[-1]
+    #     assert isinstance(firstDay,datetime)
+    #     assert isinstance(lastDay,datetime)
+    #     excelName = str(firstDay.month)+'-'+str(firstDay.day)+'To'+\
+    #                 str(lastDay.month)+'-'+str(lastDay.day)+'.xls'
+    # except:
+    now = datetime.now()
+    excelName = '%d-%d-%d_%d.xls' % (now.month, now.day, now.hour, now.minute)
+
+    # excelname = 'searchResult.xls'
+
+    excelurl = os.path.join('.', excelName)
+
+    book = xlwt.Workbook(encoding='utf-8', style_compression=0)
+    sheet = book.add_sheet('test', cell_overwrite_ok=True)
+    sheet.write(0, 0, 'currentThreadSenderId')
+    sheet.write(0, 1, 'orderId')
+    # sheet.write(0, 2, 'buyerName')
+    sheet.write(0, 2, 'buyerDate')
+    n = 1
+    # for i, j, k, t in zip(current, order, name, date):
+    for i, j, k in zip(current, order, dateList):
+        sheet.write(n, 0, i)
+        sheet.write(n, 1, j)
+        sheet.write(n, 2, k.date().__str__())
+        # sheet.write(n, 3, t)
+        n += 1
+
+    book.save(excelurl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错
