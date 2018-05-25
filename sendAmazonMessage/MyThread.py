@@ -106,7 +106,7 @@ class sendByIDClickedThread(QtCore.QThread):
                 f = open('allID.txt', 'a+')
                 f.write(i + '\n')
                 f.close()
-            orderSizeStr = str(len(self.window.orderList))
+            orderSizeStr = str(len(allIDList))
             self.window.s.scheduleSignal.emit(str(0) + r'/' + orderSizeStr)
             completedIndex = 0
             for i in allIDList:
