@@ -11,11 +11,80 @@ import traceback
 
 # 获取所有的打开页面的orderlist 和 datetimelist，但是检索要自己进行
 
+def getorderinfo(driver0,orderid):
+    orderrow = driver0.find_element_by_id("row-"+orderid)
+    orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
+    o1 = orderinfo.text
+    if(str(orderinfo.text)[-3:] == '...'):
+        info_a = orderrow.find_element_by_link_text(orderid)
+        js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
+        handle = driver0.current_window_handle
+        driver0.execute_script(js)
+
+        handles = driver0.window_handles
+        for newhandle in handles:
+
+            # 筛选新打开的窗口B
+
+            if newhandle != handle:
+
+        # 切换到新打开的窗口B
+
+                driver0.switch_to_window(newhandle)
+
+        # 在新打开的窗口B中操作
+        wait.WebDriverWait(driver0, 10000000).until(
+            EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
+        o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+
+        # 关闭当前窗口B
+
+        driver0.close()
+
+        # 切换回窗口A
+
+        driver0.switch_to_window(handles[0])
+
+    return o1
+
+
+def getorderinfo2(driver0,orderid):
+
+    js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
+    handle = driver0.current_window_handle
+    driver0.execute_script(js)
+
+    handles = driver0.window_handles
+    for newhandle in handles:
+
+        # 筛选新打开的窗口B
+
+        if newhandle != handle:
+
+    # 切换到新打开的窗口B
+
+            driver0.switch_to_window(newhandle)
+
+    # 在新打开的窗口B中操作
+    wait.WebDriverWait(driver0, 10000000).until(
+        EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
+    o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+
+    # 关闭当前窗口B
+
+    driver0.close()
+
+    # 切换回窗口A
+
+    driver0.switch_to_window(handles[0])
+
+    return o1
+
 
 def getlist(driver0):
     allorderlist = []
     alldatetimelist = []
-    allOrderNameList = []
+    allorderinfolist = []
     currentpagination = 0
     onepageflag = 0
     while True:
@@ -50,8 +119,7 @@ def getlist(driver0):
                 pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
                 orderlist = re.findall(pattern, orderlisthtml.text)
 
-                pattern0 = re.compile(r'_myoLO_\w{55}__product')
-                orderNamelist = re.findall(pattern0, orderlisthtml.text)
+                orderinfolist = []
 
                 datelist = []
                 timelist = []
@@ -65,9 +133,12 @@ def getlist(driver0):
                     thistime = re.findall(pattern2, currentordertable.text)
                     timelist.append(thistime[0])
 
+                    orderinfolist.append(getorderinfo(driver0,i))
+
                 #     把这一页的信息加入
                 allorderlist.extend(orderlist)
-                allOrderNameList.extend(orderNamelist)
+                print(orderinfolist)
+                allorderinfolist.extend(orderinfolist)
                 for i, j in zip(datelist, timelist):
                     # print('test:    '+i+'    '+j)
                     thisdatetime = datetime.strptime(i + ' ' + j, "%b %d, %Y %I:%M:%S %p")
@@ -92,7 +163,7 @@ def getlist(driver0):
             # traceback.print_exc()
             print("finish to get orderID---------------------")
             break
-    return allorderlist, alldatetimelist, allOrderNameList
+    return allorderlist, alldatetimelist, allorderinfolist
 
 
 # 尝试获取currentThreadSenderID，如果获取失败，那么返回的是none
