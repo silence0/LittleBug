@@ -162,7 +162,14 @@ class searchClickedThread(QtCore.QThread):
             self.window.driver.get(self.window.getThreadUrl)
             bMutex.unlock()
             time.sleep(3)
+            allIDText = open('searchAllID.txt','w')
             for i in self.window.orderList:
+                allIDText.write(i+'\n')
+            allIDText.close()
+            t = open('searchSentID.txt','w')
+            t.close()
+            for i in self.window.orderList:
+                sendIDText = open('searchSentID.txt', 'a')
                 while True:
                     get = tool.getcurrent(self.window.driver, i)
                     if get == None:
@@ -174,6 +181,8 @@ class searchClickedThread(QtCore.QThread):
                     else:
                         #                     说明搜索到了，那么这个信件就不用重新发了
                         self.window.currentThreadSenderList.append(get)
+                        sendIDText.write(i+'     '+get+'\n')
+                        sendIDText.close()
                         break
 
                 self.window.s.addLogItemSignal.emit('Order ID:' + str(i) + '\nCurrentThreadSenderID:' + str(get))
