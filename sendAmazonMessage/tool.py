@@ -116,6 +116,7 @@ def getlist(driver0):
                     pagefulltext = re.findall(pattern11, pagefulltr.text)
                     pagetext = str(pagefulltext[0])
                     maxnum = pagetext.split()[-1]
+                    print("pagenumberget:" + str(time.clock()))
                     if int(maxnum) <= 100:
                         onepageflag = 1
                         print('onegage!')
@@ -141,11 +142,12 @@ def getlist(driver0):
                 for i in allordertr:
                     orderid = str(i.get_attribute('id'))[-19:]
                     orderlist.append(orderid)
+                    print("orderget:" + str(time.clock()))
                 # pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
                 # orderlist = re.findall(pattern, orderlisthtml.text)
 
                 # orderinfolist = []
-
+                print("allorderget:" + str(time.clock()))
                 datelist = []
                 timelist = []
                 for i in orderlist:
@@ -162,6 +164,7 @@ def getlist(driver0):
                 bMutex.unlock()
                 #     把这一页的信息加入
                 allorderlist.extend(orderlist)
+                print("alldateget:" + str(time.clock()))
                 # print(orderinfolist)
                 # allorderinfolist.extend(orderinfolist)
                 for i, j in zip(datelist, timelist):
@@ -191,6 +194,7 @@ def getlist(driver0):
             bMutex.unlock()
             # traceback.print_exc()
             print("finish to get orderID---------------------")
+            print("finish:" + str(time.clock()))
             break
     return allorderlist, alldatetimelist
 

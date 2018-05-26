@@ -71,11 +71,13 @@ def getlist(driver0):
 
 
 # Configurations on Mac
-url = r'file:///Users/djc/Downloads/4_files/7.html'
+# url = r'file:///Users/djc/Downloads/4_files/7.html'
+print("start:" + str(time.clock()))
+url = r'file:///Users/djc/Desktop/spider/Manage%20Orders%20-%20Amazon.html'
 excelUrl = r'/Users/djc/Desktop/test1.xls'
 
 driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')
-
+print("chrome ready:" + str(time.clock()))
 
 # Configurations on Windows
 # url = r'https://sellercentral.amazon.com/messaging/inbox'
@@ -102,22 +104,25 @@ driver.get(url)
 # str1 = 'May 9, 2018 4:04:55 PM'
 # dt = datetime.strptime(str1, "%b %d, %Y %I:%M:%S %p")
 # print(dt)
-orderlisthtml = wait.WebDriverWait(driver, 10000000).until(EC.presence_of_element_located((By.ID, 'myo-table')))
 
+orderlisthtml = wait.WebDriverWait(driver, 10000000).until(EC.presence_of_element_located((By.ID, 'myo-table')))
+print("html ready:" + str(time.clock()))
 pagefulltr = driver.find_element_by_xpath("//div[@id='myo-table']/table/tbody/tr[1]")
 pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
 pagefulltext = re.findall(pattern11, pagefulltr.text)
 pagetext = str(pagefulltext[0])
 maxnum = pagetext.split()[-1]
-
+print("pagenumberget:" + str(time.clock()))
 print(maxnum)
 orderlist = []
 allordertr = driver.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
+
 for i in allordertr:
     orderid = str(i.get_attribute('id'))[-19:]
     orderlist.append(orderid)
 print(orderlist)
-
+print(len(orderlist))
+print("allorderget:" + str(time.clock()))
 # orderinfo = driver.find_elements_by_xpath("//span[contains(@id,'___product')]")
 # info_a = driver.find_element_by_xpath("//a[contains(@href,'orderId=111-2389060-6443420')]")
 # info_a = driver.find_element_by_link_text("111-2389060-6443420")
