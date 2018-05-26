@@ -138,27 +138,32 @@ def getlist(driver0):
                 orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
                 orderlist = []
+                datelist = []
+                timelist = []
                 allordertr = driver0.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
                 for i in allordertr:
                     orderid = str(i.get_attribute('id'))[-19:]
                     orderlist.append(orderid)
-                    print("orderget:" + str(time.clock()))
+                    datetd = i.find_element_by_xpath("./td[2]")
+                    # print(datetd.text)
+                    thisdate = str(datetd.text).split('\n')
+                    datelist.append(thisdate[0])
+                    timelist.append(thisdate[1])
                 # pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
                 # orderlist = re.findall(pattern, orderlisthtml.text)
 
                 # orderinfolist = []
                 print("allorderget:" + str(time.clock()))
-                datelist = []
-                timelist = []
-                for i in orderlist:
-                    currentordertable = driver0.find_element_by_id('row-' + i)
-                    pattern1 = re.compile(r'\w{3} \d{1,2}, \d{4}')
-                    thisdate = re.findall(pattern1, currentordertable.text)
-                    datelist.append(thisdate[0])
 
-                    pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
-                    thistime = re.findall(pattern2, currentordertable.text)
-                    timelist.append(thistime[0])
+                # for i in orderlist:
+                #     currentordertable = driver0.find_element_by_id('row-' + i)
+                #     pattern1 = re.compile(r'\w{3} \d{1,2}, \d{4}')
+                #     thisdate = re.findall(pattern1, currentordertable.text)
+                #     datelist.append(thisdate[0])
+                #
+                #     pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
+                #     thistime = re.findall(pattern2, currentordertable.text)
+                #     timelist.append(thistime[0])
                     #
                     # orderinfolist.append(getorderinfo(driver0,i))
                 bMutex.unlock()

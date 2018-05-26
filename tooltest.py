@@ -112,17 +112,39 @@ pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
 pagefulltext = re.findall(pattern11, pagefulltr.text)
 pagetext = str(pagefulltext[0])
 maxnum = pagetext.split()[-1]
-print("pagenumberget:" + str(time.clock()))
+print("pagenumber get:" + str(time.clock()))
 print(maxnum)
 orderlist = []
+datelist = []
+timelist = []
 allordertr = driver.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
 
 for i in allordertr:
     orderid = str(i.get_attribute('id'))[-19:]
     orderlist.append(orderid)
+    datetd = i.find_element_by_xpath("./td[2]")
+    # print(datetd.text)
+    thisdate = str(datetd.text).split('\n')
+    datelist.append(thisdate[0])
+    timelist.append(thisdate[1])
 print(orderlist)
 print(len(orderlist))
-print("allorderget:" + str(time.clock()))
+print("all order and date get:" + str(time.clock()))
+
+# for i in orderlist:
+#     currentordertable = driver.find_element_by_id('row-' + i)
+#     pattern1 = re.compile(r'\w{3} \d{1,2}, \d{4}')
+#     thisdate = re.findall(pattern1, currentordertable.text)
+#     datelist.append(thisdate[0])
+#
+#     pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
+#     thistime = re.findall(pattern2, currentordertable.text)
+#     timelist.append(thistime[0])
+#     # print("dateget:" + str(time.clock()))
+#     #
+#     # orderinfolist.append(getorderinfo(driver0,i))
+# #     把这一页的信息加入
+print("alldateget:" + str(time.clock()))
 # orderinfo = driver.find_elements_by_xpath("//span[contains(@id,'___product')]")
 # info_a = driver.find_element_by_xpath("//a[contains(@href,'orderId=111-2389060-6443420')]")
 # info_a = driver.find_element_by_link_text("111-2389060-6443420")
