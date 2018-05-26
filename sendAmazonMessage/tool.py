@@ -113,7 +113,7 @@ def getlist(driver0):
                     pagefulltext = re.findall(pattern11, orderlisthtml.text)
                     pagetext = str(pagefulltext[0])
                     maxnum = pagetext.split()[-1]
-                    if int(maxnum) <= 15:
+                    if int(maxnum) <= 100:
                         onepageflag = 1
                         print('onegage!')
                         break
