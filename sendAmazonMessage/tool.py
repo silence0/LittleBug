@@ -8,10 +8,12 @@ import xlwt
 import os
 from datetime import datetime
 import traceback
-
+from VAR import bMutex
 # 获取所有的打开页面的orderlist 和 datetimelist，但是检索要自己进行
 
+
 def getorderinfo(driver0,orderid):
+    bMutex.lock()
     orderrow = driver0.find_element_by_id("row-"+orderid)
     orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
     o1 = orderinfo.text
@@ -20,7 +22,6 @@ def getorderinfo(driver0,orderid):
         js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
         handle = driver0.current_window_handle
         driver0.execute_script(js)
-
         handles = driver0.window_handles
         for newhandle in handles:
 
@@ -44,12 +45,12 @@ def getorderinfo(driver0,orderid):
         # 切换回窗口A
 
         driver0.switch_to_window(handles[0])
-
+    bMutex.unlock()
     return o1
 
 
 def getorderinfo2(driver0,orderid):
-
+    bMutex.lock()
     js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
     handle = driver0.current_window_handle
     driver0.execute_script(js)
@@ -77,14 +78,14 @@ def getorderinfo2(driver0,orderid):
     # 切换回窗口A
 
     driver0.switch_to_window(handles[0])
-
+    bMutex.unlock()
     return o1
 
 
 def getlist(driver0):
     allorderlist = []
     alldatetimelist = []
-    allorderinfolist = []
+    # allorderinfolist = []
     currentpagination = 0
     onepageflag = 0
     while True:
@@ -92,8 +93,10 @@ def getlist(driver0):
             # 获取当前页数的循环，如果发生了不可预知的错误，那么重新进行
             try:
                 time.sleep(2)
+                bMutex.lock()
                 orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
+                bMutex.unlock()
                 if currentpagination == 0:
                     pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
                     pagefulltext = re.findall(pattern11, orderlisthtml.text)
@@ -103,23 +106,27 @@ def getlist(driver0):
                         onepageflag = 1
                         print('onegage!')
                         break
-
+                bMutex.lock()
                 currentpagination1 = driver0.find_element_by_xpath("//strong[@class = 'currentpagination']").text
+                bMutex.unlock()
                 if int(currentpagination1) == int(currentpagination) + 1:
                     break
             except Exception as e:
+                bMutex.unlock()
                 traceback.print_exc()
                 print('try again---------------------------------')
 
         # 匹配
         while True:
             try:
+                bMutex.lock()
                 orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
+
                 pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
                 orderlist = re.findall(pattern, orderlisthtml.text)
 
-                orderinfolist = []
+                # orderinfolist = []
 
                 datelist = []
                 timelist = []
@@ -132,13 +139,13 @@ def getlist(driver0):
                     pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
                     thistime = re.findall(pattern2, currentordertable.text)
                     timelist.append(thistime[0])
-
-                    orderinfolist.append(getorderinfo(driver0,i))
-
+                    #
+                    # orderinfolist.append(getorderinfo(driver0,i))
+                bMutex.unlock()
                 #     把这一页的信息加入
                 allorderlist.extend(orderlist)
-                print(orderinfolist)
-                allorderinfolist.extend(orderinfolist)
+                # print(orderinfolist)
+                # allorderinfolist.extend(orderinfolist)
                 for i, j in zip(datelist, timelist):
                     # print('test:    '+i+'    '+j)
                     thisdatetime = datetime.strptime(i + ' ' + j, "%b %d, %Y %I:%M:%S %p")
@@ -147,6 +154,7 @@ def getlist(driver0):
                 # todo:这一页成功了，那么记录成功页到文件中即可
                 break
             except Exception as e:
+                bMutex.unlock()
                 traceback.print_exc()
                 print('try again----------------------------')
 
@@ -155,15 +163,18 @@ def getlist(driver0):
             break
 
         try:
+            bMutex.lock()
             nextpagebutton = driver0.find_element_by_xpath("//a[text()='Next' and @class = 'myo_list_orders_link']")
             currentpagination = driver0.find_element_by_xpath("//strong[@class = 'currentpagination']").text
             nextpagebutton.click()
+            bMutex.unlock()
             print("next")
         except Exception as e:
+            bMutex.unlock()
             # traceback.print_exc()
             print("finish to get orderID---------------------")
             break
-    return allorderlist, alldatetimelist, allorderinfolist
+    return allorderlist, alldatetimelist
 
 
 # 尝试获取currentThreadSenderID，如果获取失败，那么返回的是none
@@ -171,6 +182,7 @@ def getcurrent(driver0, orderid):
     while True:
         try:
             time.sleep(2)
+            bMutex.lock()
             wait.WebDriverWait(driver0, 5).until(
                 EC.presence_of_element_located((By.ID, 'search-text-box')))
             idinput = driver0.find_element_by_id("search-text-box")
@@ -181,19 +193,24 @@ def getcurrent(driver0, orderid):
             driver0.execute_script('arguments[0].click();', searchbutton)
             # searchbutton.click()
             # 只有不出现任何问题，才能继续，否则重新来一遍
+            bMutex.unlock()
             break
         except Exception as e:
+            bMutex.unlock()
             traceback.print_exc()
             print('try again--------------------')
     try:
         # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
         time.sleep(2)
+        bMutex.lock()
         wait.WebDriverWait(driver0, 3).until(
             EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
         current = driver0.find_element_by_id('currentThreadSenderId').get_attribute('value')
+        bMutex.unlock()
         return current
     except Exception as e:
         # traceback.print_exc()
+        bMutex.unlock()
         print('No result found, ready to send message')
         return None
 
