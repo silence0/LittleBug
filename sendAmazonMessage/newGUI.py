@@ -149,7 +149,7 @@ class MyMainWindow(QFrame):
 
         # self.sendMessageUrl = r'file:///C:/Users/60913/Desktop/4_files/6.html'
         self.selectDateUrl = r'https://sellercentral.amazon.com/gp/orders-v2/search/ref=ag_myosearch_apsearch_myo'
-        # self.selectDateUrl = r'file:///C:/Users/60913/Desktop/4_files/2.html'
+        # self.selectDateUrl = r'file:///C:/Users/60913/Desktop/4_files/7.html'
         # self.getOrderListUrl = r'file:///C:/Users/60913/Desktop/4_files/2.html'
         self.getThreadUrl = r'https://sellercentral.amazon.com/messaging/inbox/ref=ag_cmin_head_xx'
         # self.driver = webdriver.Chrome(executable_path=driverPath, options=chromeOptions)

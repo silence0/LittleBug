@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support import wait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import select
 import re
 import time
 import xlwt
@@ -88,6 +89,18 @@ def getlist(driver0):
     # allorderinfolist = []
     currentpagination = 0
     onepageflag = 0
+    bMutex.lock()
+    wait.WebDriverWait(driver0, 10000000).until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, "select[name='itemsPerPage']")))
+    selectPagPer = select.Select(driver0.find_elements_by_name('itemsPerPage')[-1])
+    selectPagPer.select_by_value('100')
+    assert isinstance(driver0,webdriver.Chrome)
+    goButton = driver0.find_elements_by_css_selector("input[type='image'][width='21'")
+    goButton = goButton[-1]
+    goButton.click()
+    bMutex.unlock()
+    time.sleep(5)
+
     while True:
         while True:
             # 获取当前页数的循环，如果发生了不可预知的错误，那么重新进行
@@ -102,7 +115,7 @@ def getlist(driver0):
                     pagefulltext = re.findall(pattern11, orderlisthtml.text)
                     pagetext = str(pagefulltext[0])
                     maxnum = pagetext.split()[-1]
-                    if int(maxnum) <= 15:
+                    if int(maxnum) <= 100:
                         onepageflag = 1
                         print('onegage!')
                         break
