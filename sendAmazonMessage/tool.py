@@ -148,7 +148,7 @@ def getlist(driver0):
                     # print(datetd.text)
                     thisdate = str(datetd.text).split('\n')
                     datelist.append(thisdate[0])
-                    timelist.append(thisdate[1])
+                    timelist.append(thisdate[1][:-4])
                 # pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
                 # orderlist = re.findall(pattern, orderlisthtml.text)
 
