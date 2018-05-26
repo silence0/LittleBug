@@ -111,8 +111,9 @@ def getlist(driver0):
                     EC.presence_of_element_located((By.ID, 'myo-table')))
                 bMutex.unlock()
                 if currentpagination == 0:
+                    pagefulltr = driver0.find_element_by_xpath("//div[@id='myo-table']/table/tbody/tr[1]")
                     pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
-                    pagefulltext = re.findall(pattern11, orderlisthtml.text)
+                    pagefulltext = re.findall(pattern11, pagefulltr.text)
                     pagetext = str(pagefulltext[0])
                     maxnum = pagetext.split()[-1]
                     if int(maxnum) <= 100:
@@ -135,9 +136,13 @@ def getlist(driver0):
                 bMutex.lock()
                 orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
-
-                pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
-                orderlist = re.findall(pattern, orderlisthtml.text)
+                orderlist = []
+                allordertr = driver0.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[position()>3]")
+                for i in allordertr:
+                    orderid = str(i.get_attribute('id'))[-19:]
+                    orderlist.append(orderid)
+                # pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
+                # orderlist = re.findall(pattern, orderlisthtml.text)
 
                 # orderinfolist = []
 

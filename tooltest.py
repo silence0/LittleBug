@@ -102,12 +102,21 @@ driver.get(url)
 # str1 = 'May 9, 2018 4:04:55 PM'
 # dt = datetime.strptime(str1, "%b %d, %Y %I:%M:%S %p")
 # print(dt)
-# orderlisthtml = wait.WebDriverWait(driver, 10000000).until(EC.presence_of_element_located((By.ID, 'myo-table')))
+orderlisthtml = wait.WebDriverWait(driver, 10000000).until(EC.presence_of_element_located((By.ID, 'myo-table')))
 
-# pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
-# pagefulltext = re.findall(pattern11, orderlisthtml.text)
-# pagetext = str(pagefulltext[0])
-# maxnum = pagetext.split()[-1]
+pagefulltr = driver.find_element_by_xpath("//div[@id='myo-table']/table/tbody/tr[1]")
+pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
+pagefulltext = re.findall(pattern11, pagefulltr.text)
+pagetext = str(pagefulltext[0])
+maxnum = pagetext.split()[-1]
+
+print(maxnum)
+orderlist = []
+allordertr = driver.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[position()>3]")
+for i in allordertr:
+    orderid = str(i.get_attribute('id'))[-19:]
+    orderlist.append(orderid)
+print(orderlist)
 
 # orderinfo = driver.find_elements_by_xpath("//span[contains(@id,'___product')]")
 # info_a = driver.find_element_by_xpath("//a[contains(@href,'orderId=111-2389060-6443420')]")
@@ -159,7 +168,7 @@ def getorderinfo(driver0,orderid):
     return o1
 
 
-print(getorderinfo(driver, '112-7159011-6004236'))
+# print(getorderinfo(driver, '112-7159011-6004236'))
 
 
 
