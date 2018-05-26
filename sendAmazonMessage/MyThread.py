@@ -2,11 +2,10 @@ import time
 
 from PyQt5 import QtCore
 from selenium import webdriver
-
 import send
 import tool
 import traceback
-
+from VAR import bMutex
 
 class mySingal(QtCore.QObject):
     graySignal = QtCore.pyqtSignal()
@@ -36,6 +35,7 @@ class sendByDateClickedThread(QtCore.QThread):
 
     def run(self):
         try:
+            bMutex.lock()
             self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
                                                   options=self.window.chromeOptions)
             self.window.setDriver(self.window.driver)
@@ -49,6 +49,7 @@ class sendByDateClickedThread(QtCore.QThread):
 
             # 获取orderid,并创建各种list
             self.window.driver.get(self.window.selectDateUrl)
+            bMutex.unlock()
             self.window.orderList, self.window.dateList = tool.getlist(self.window.driver)
             self.window.currentThreadSenderList = []
             self.window.nameList = []
@@ -76,6 +77,7 @@ class sendByDateClickedThread(QtCore.QThread):
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.ungraySignal.emit()
         except Exception as e:
+            bMutex.unlock()
             traceback.print_exc()
             self.window.s.errorSignal.emit()
 
@@ -87,9 +89,11 @@ class sendByIDClickedThread(QtCore.QThread):
 
     def run(self):
         try:
+            bMutex.lock()
             self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
                                                   options=self.window.chromeOptions)
             self.window.setDriver(self.window.driver)
+            bMutex.unlock()
 
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
             self.window.nameList = []
@@ -127,6 +131,7 @@ class sendByIDClickedThread(QtCore.QThread):
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.ungraySignal.emit()
         except Exception as e:
+            bMutex.unlock()
             traceback.print_exc()
             self.window.s.errorSignal.emit()
 
@@ -138,11 +143,13 @@ class searchClickedThread(QtCore.QThread):
 
     def run(self):
         try:
+            bMutex.lock()
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
             self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
                                                   options=self.window.chromeOptions)
             self.window.setDriver(self.window.driver)
             self.window.driver.get(self.window.selectDateUrl)
+            bMutex.unlock()
             time.sleep(3)
             self.window.orderList, self.window.dateList = tool.getlist(self.window.driver)
             self.window.currentThreadSenderList = []
@@ -151,7 +158,9 @@ class searchClickedThread(QtCore.QThread):
             self.window.s.scheduleSignal.emit(str(0) + r'/' + orderSizeStr)
             completedIndex = 0
             #         拿这些ID去搜索
+            bMutex.lock()
             self.window.driver.get(self.window.getThreadUrl)
+            bMutex.unlock()
             time.sleep(3)
             for i in self.window.orderList:
                 while True:
@@ -159,7 +168,9 @@ class searchClickedThread(QtCore.QThread):
                     if get == None:
                         #                 说明没搜索到呀，那么就要给他发信
                         send.sendMessage(send.generateSendMessageUrl(i), self.window.modelText, self.window.driver, i)
+                        bMutex.lock()
                         self.window.driver.get(self.window.getThreadUrl)
+                        bMutex.unlock()
                     else:
                         #                     说明搜索到了，那么这个信件就不用重新发了
                         self.window.currentThreadSenderList.append(get)
@@ -175,5 +186,6 @@ class searchClickedThread(QtCore.QThread):
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.ungraySignal.emit()
         except Exception as e:
+            bMutex.unlock()
             traceback.print_exc()
             self.window.s.errorSignal.emit()

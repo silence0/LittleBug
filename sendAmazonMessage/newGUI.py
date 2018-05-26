@@ -2,13 +2,12 @@ import getpass
 import traceback
 import os
 import sys
-
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from selenium import webdriver
 
 from MyThread import searchClickedThread, sendByIDClickedThread, sendByDateClickedThread, mySingal, testThread
-
+from VAR import bMutex
 
 class Header(QFrame):
     def __init__(self, parent):
@@ -80,6 +79,8 @@ class MyMainWindow(QFrame):
         self.s = mySingal()
         self.initAsySignal()
         self.initPath()
+        # self.browserMutex = QMutex()
+        self.browserShowFlag = True
 
     def setDriver(self, d):
         self.driver = d
@@ -148,6 +149,7 @@ class MyMainWindow(QFrame):
 
         # self.sendMessageUrl = r'file:///C:/Users/60913/Desktop/4_files/6.html'
         self.selectDateUrl = r'https://sellercentral.amazon.com/gp/orders-v2/search/ref=ag_myosearch_apsearch_myo'
+        # self.selectDateUrl = r'file:///C:/Users/60913/Desktop/4_files/2.html'
         # self.getOrderListUrl = r'file:///C:/Users/60913/Desktop/4_files/2.html'
         self.getThreadUrl = r'https://sellercentral.amazon.com/messaging/inbox/ref=ag_cmin_head_xx'
         # self.driver = webdriver.Chrome(executable_path=driverPath, options=chromeOptions)
@@ -290,21 +292,35 @@ class LeftPage(QFrame):
             self.tempVar = 1
 
     def hideBrowser(self):
-        try:
-            if self.browserShowFlag == True:
-                self.parent.driver.set_window_position(-2000, 0)
-                # self.parent.driver.maximize_window()
-                self.parent.driver.set_window_size(1000, 1000)
-                self.browserShowFlag = False
 
-            elif self.browserShowFlag == False:
-                self.parent.driver.set_window_position(0, 0)
-                self.parent.driver.maximize_window()
-                self.browserShowFlag = True
-        except:
-            traceback.print_exc()
-            print('browser page wrong!')
+        class hideBrowserThread(QThread):
+            def __init__(self,parent,mainWindow):
+                super(hideBrowserThread, self).__init__(parent=parent)
+                self.window = mainWindow
+                self.par = parent
+            def run(self):
+                assert isinstance(self.window,MyMainWindow)
+                self.window.s.informationSignal.emit('wait!,','Please wait for a moment')
+                bMutex.lock()
+                try:
+                    if self.par.browserShowFlag == True:
+                        self.window.driver.set_window_position(-2000, 0)
+                        self.window.driver.set_window_size(1000, 1000)
+                        self.par.browserShowFlag = False
 
+                    elif self.par.browserShowFlag == False:
+                        self.window.driver.set_window_position(0, 0)
+                        self.window.driver.maximize_window()
+                        self.par.browserShowFlag = True
+                    # self.window.browserMutex.unlock()
+                    bMutex.unlock()
+                except:
+                    bMutex.unlock()
+                    traceback.print_exc()
+                    print('browser page wrong!')
+        assert isinstance(self.parent,MyMainWindow)
+        self.parent.hideBrowserThread = hideBrowserThread(self,self.parent)
+        self.parent.hideBrowserThread.start()
     def startClicked(self):
         if self.selectButtonBox.checkedId() == 1:
             self.workThread = sendByDateClickedThread(self.parent)
