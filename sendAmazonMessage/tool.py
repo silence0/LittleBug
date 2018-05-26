@@ -137,7 +137,7 @@ def getlist(driver0):
                 orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
                 orderlist = []
-                allordertr = driver0.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[position()>3]")
+                allordertr = driver0.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
                 for i in allordertr:
                     orderid = str(i.get_attribute('id'))[-19:]
                     orderlist.append(orderid)

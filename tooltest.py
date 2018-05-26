@@ -112,7 +112,7 @@ maxnum = pagetext.split()[-1]
 
 print(maxnum)
 orderlist = []
-allordertr = driver.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[position()>3]")
+allordertr = driver.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
 for i in allordertr:
     orderid = str(i.get_attribute('id'))[-19:]
     orderlist.append(orderid)
