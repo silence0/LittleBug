@@ -102,22 +102,30 @@ def getlist(driver0):
     time.sleep(5)
 
     while True:
+        # 最外层循环用来翻页
+
+        # 获取当前页数的循环，如果发生了不可预知的错误，那么重新进行
         while True:
-            # 获取当前页数的循环，如果发生了不可预知的错误，那么重新进行
             try:
                 time.sleep(2)
                 bMutex.lock()
                 orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
                 bMutex.unlock()
+                # 如果是刚开始，那么判断一下是不是只有一页（因为一页的时候网页排版不同）
                 if currentpagination == 0:
+                    time.sleep(3)
+                    bMutex.lock()
                     pagefulltr = driver0.find_element_by_xpath("//div[@id='myo-table']/table/tbody/tr[1]")
-                    pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
-                    pagefulltext = re.findall(pattern11, pagefulltr.text)
-                    pagetext = str(pagefulltext[0])
-                    maxnum = pagetext.split()[-1]
-                    print("pagenumberget:" + str(time.clock()))
-                    if int(maxnum) <= 100:
+                    bMutex.unlock()
+                    # pattern11 = re.compile(r'Orders \d+ to \d+')
+                    # pagefulltext = re.findall(pattern11, pagefulltr.text)
+                    # pagetext = str(pagefulltext[0])
+                    # maxnum = pagetext.split()[-1]
+                    # print("pagenumberget:" + str(time.clock()))
+                    # bMutex.unlock()
+                    # if int(maxnum) <= 100:
+                    if 'of' not in pagefulltr.text:
                         onepageflag = 1
                         print('onegage!')
                         break
@@ -259,7 +267,9 @@ def writeExcel(current, order, dateList):
     #                 str(lastDay.month)+'-'+str(lastDay.day)+'.xls'
     # except:
     now = datetime.now()
-    excelName = '%d-%d-%d_%d.xls' % (now.month, now.day, now.hour, now.minute)
+    startDate = dateList[-1]
+    endDate = dateList[0]
+    excelName = '%d-%d_%d-%d.xls' % (startDate.month,startDate.day,endDate.month,endDate.day)
 
     # excelname = 'searchResult.xls'
 
