@@ -24,7 +24,7 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             bMutex.unlock()
             time.sleep(2)
             bMutex.lock()
-            selectButtonWait = wait.WebDriverWait(driver,100000).until(EC.visibility_of_element_located((By.ID,'commMgrCompositionSubject')))
+            selectButtonWait = wait.WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.ID,'commMgrCompositionSubject')))
             selectSubject = Select(driver.find_element_by_id('commMgrCompositionSubject'))
             selectSubject.select_by_index(1)
 
@@ -53,7 +53,7 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             # 发送的内容
             # modelStr = 'dear '+name+':\n'+modelStr
             bMutex.lock()
-            wait.WebDriverWait(driver,100000).until(EC.visibility_of_element_located((By.ID,'commMgrCompositionMessage')))
+            wait.WebDriverWait(driver,10).until(EC.visibility_of_element_located((By.ID,'commMgrCompositionMessage')))
             textArea = driver.find_element_by_id('commMgrCompositionMessage')
             driver.execute_script("arguments[0].value="+modelStr+";",textArea)
             bMutex.unlock()
@@ -68,14 +68,14 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
 
             # 点击发送邮件按钮
             bMutex.lock()
-            wait.WebDriverWait(driver,10000).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR,'#sendemail_label')))
+            wait.WebDriverWait(driver,10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR,'#sendemail_label')))
             allSendMailLabel = driver.find_elements_by_css_selector('#sendemail')
             allSendMailLabel = allSendMailLabel[1]
             driver.execute_script("arguments[0].click();", allSendMailLabel)
 
             # 点了发送休息2S
             # time.sleep(3)
-            wait.WebDriverWait(driver, 100).until(EC.presence_of_element_located((By.NAME, 'Back to Manage Orders')))
+            wait.WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.NAME, 'Back to Manage Orders')))
             bMutex.unlock()
             print('send OK')
             return name

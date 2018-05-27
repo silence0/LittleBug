@@ -10,15 +10,17 @@ import os
 from datetime import datetime
 import traceback
 from VAR import bMutex
+
+
 # 获取所有的打开页面的orderlist 和 datetimelist，但是检索要自己进行
 
 
-def getorderinfo(driver0,orderid):
+def getorderinfo(driver0, orderid):
     bMutex.lock()
-    orderrow = driver0.find_element_by_id("row-"+orderid)
+    orderrow = driver0.find_element_by_id("row-" + orderid)
     orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
     o1 = orderinfo.text
-    if(str(orderinfo.text)[-3:] == '...'):
+    if (str(orderinfo.text)[-3:] == '...'):
         info_a = orderrow.find_element_by_link_text(orderid)
         js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
         handle = driver0.current_window_handle
@@ -29,8 +31,7 @@ def getorderinfo(driver0,orderid):
             # 筛选新打开的窗口B
 
             if newhandle != handle:
-
-        # 切换到新打开的窗口B
+                # 切换到新打开的窗口B
 
                 driver0.switch_to_window(newhandle)
 
@@ -50,7 +51,7 @@ def getorderinfo(driver0,orderid):
     return o1
 
 
-def getorderinfo2(driver0,orderid):
+def getorderinfo2(driver0, orderid):
     bMutex.lock()
     js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
     handle = driver0.current_window_handle
@@ -62,8 +63,7 @@ def getorderinfo2(driver0,orderid):
         # 筛选新打开的窗口B
 
         if newhandle != handle:
-
-    # 切换到新打开的窗口B
+            # 切换到新打开的窗口B
 
             driver0.switch_to_window(newhandle)
 
@@ -94,7 +94,7 @@ def getlist(driver0):
         EC.visibility_of_element_located((By.CSS_SELECTOR, "select[name='itemsPerPage']")))
     selectPagPer = select.Select(driver0.find_elements_by_name('itemsPerPage')[-1])
     selectPagPer.select_by_value('100')
-    assert isinstance(driver0,webdriver.Chrome)
+    assert isinstance(driver0, webdriver.Chrome)
     goButton = driver0.find_elements_by_css_selector("input[type='image'][width='21'")
     goButton = goButton[-1]
     goButton.click()
@@ -140,9 +140,12 @@ def getlist(driver0):
                 orderlist = []
                 datelist = []
                 timelist = []
-                allordertr = driver0.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
+                allordertr = driver0.find_elements_by_xpath(
+                    "//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
                 for i in allordertr:
                     orderid = str(i.get_attribute('id'))[-19:]
+                    if re.match(re.compile('\d{3}-\d{7}-\d{7}'),orderid) == None:
+                        continue
                     orderlist.append(orderid)
                     datetd = i.find_element_by_xpath("./td[2]")
                     # print(datetd.text)
@@ -164,8 +167,8 @@ def getlist(driver0):
                 #     pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
                 #     thistime = re.findall(pattern2, currentordertable.text)
                 #     timelist.append(thistime[0])
-                    #
-                    # orderinfolist.append(getorderinfo(driver0,i))
+                #
+                # orderinfolist.append(getorderinfo(driver0,i))
                 bMutex.unlock()
                 #     把这一页的信息加入
                 allorderlist.extend(orderlist)
@@ -226,17 +229,19 @@ def getcurrent(driver0, orderid):
             bMutex.unlock()
             traceback.print_exc()
             print('try again--------------------')
+
     try:
         # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
         time.sleep(2)
         bMutex.lock()
-        wait.WebDriverWait(driver0, 3).until(
+        idDom = wait.WebDriverWait(driver0, 3).until(
             EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-        current = driver0.find_element_by_id('currentThreadSenderId').get_attribute('value')
+        current = idDom.get_attribute('value')
         bMutex.unlock()
         return current
     except Exception as e:
         # traceback.print_exc()
+
         bMutex.unlock()
         print('No result found, ready to send message')
         return None
