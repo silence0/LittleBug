@@ -254,6 +254,43 @@ def getcurrent(driver0, orderid):
         print('No result found, ready to send message')
         return None
 
+def getcurrent2(driver0, orderid,lastcurrentid):
+    while True:
+        try:
+            bMutex.lock()
+            wait.WebDriverWait(driver0, 5).until(
+                EC.presence_of_element_located((By.ID, 'search-text-box')))
+            idinput = driver0.find_element_by_id("search-text-box")
+            searchbutton = driver0.find_element_by_name("Search")
+            # idinput.clear()
+            # idinput.send_keys(orderid)
+            driver0.execute_script("arguments[0].value=" + "'" + orderid + "'", idinput)
+            driver0.execute_script('arguments[0].click();', searchbutton)
+            # searchbutton.click()
+            # 只有不出现任何问题，才能继续，否则重新来一遍
+            bMutex.unlock()
+            break
+        except Exception as e:
+            bMutex.unlock()
+            traceback.print_exc()
+            print('try again--------------------')
+
+    try:
+        # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
+        bMutex.lock()
+        idDom = wait.WebDriverWait(driver0, 3).until(
+            EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+        current = idDom.get_attribute('value')
+        bMutex.unlock()
+        if current != lastcurrentid:
+            return current
+    except Exception as e:
+        # traceback.print_exc()
+
+        bMutex.unlock()
+        print('No result found, ready to send message')
+        return None
+
 
 def writeExcel(current, order, dateList):
     # excelname = str(month) + '-' + str(day) + 'to' + str(month2) + '-' + str(day2) + '.xls'
