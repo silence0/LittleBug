@@ -10,15 +10,17 @@ import os
 from datetime import datetime
 import traceback
 from VAR import bMutex
+
+
 # 获取所有的打开页面的orderlist 和 datetimelist，但是检索要自己进行
 
 
-def getorderinfo(driver0,orderid):
+def getorderinfo(driver0, orderid):
     bMutex.lock()
-    orderrow = driver0.find_element_by_id("row-"+orderid)
+    orderrow = driver0.find_element_by_id("row-" + orderid)
     orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
     o1 = orderinfo.text
-    if(str(orderinfo.text)[-3:] == '...'):
+    if (str(orderinfo.text)[-3:] == '...'):
         info_a = orderrow.find_element_by_link_text(orderid)
         js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
         handle = driver0.current_window_handle
@@ -29,8 +31,7 @@ def getorderinfo(driver0,orderid):
             # 筛选新打开的窗口B
 
             if newhandle != handle:
-
-        # 切换到新打开的窗口B
+                # 切换到新打开的窗口B
 
                 driver0.switch_to_window(newhandle)
 
@@ -50,7 +51,7 @@ def getorderinfo(driver0,orderid):
     return o1
 
 
-def getorderinfo2(driver0,orderid):
+def getorderinfo2(driver0, orderid):
     bMutex.lock()
     js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
     handle = driver0.current_window_handle
@@ -62,8 +63,7 @@ def getorderinfo2(driver0,orderid):
         # 筛选新打开的窗口B
 
         if newhandle != handle:
-
-    # 切换到新打开的窗口B
+            # 切换到新打开的窗口B
 
             driver0.switch_to_window(newhandle)
 
@@ -94,7 +94,7 @@ def getlist(driver0):
         EC.visibility_of_element_located((By.CSS_SELECTOR, "select[name='itemsPerPage']")))
     selectPagPer = select.Select(driver0.find_elements_by_name('itemsPerPage')[-1])
     selectPagPer.select_by_value('100')
-    assert isinstance(driver0,webdriver.Chrome)
+    assert isinstance(driver0, webdriver.Chrome)
     goButton = driver0.find_elements_by_css_selector("input[type='image'][width='21'")
     goButton = goButton[-1]
     goButton.click()
@@ -102,21 +102,30 @@ def getlist(driver0):
     time.sleep(5)
 
     while True:
+        # 最外层循环用来翻页
+
+        # 获取当前页数的循环，如果发生了不可预知的错误，那么重新进行
         while True:
-            # 获取当前页数的循环，如果发生了不可预知的错误，那么重新进行
             try:
                 time.sleep(2)
                 bMutex.lock()
                 orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
                 bMutex.unlock()
+                # 如果是刚开始，那么判断一下是不是只有一页（因为一页的时候网页排版不同）
                 if currentpagination == 0:
+                    time.sleep(3)
+                    bMutex.lock()
                     pagefulltr = driver0.find_element_by_xpath("//div[@id='myo-table']/table/tbody/tr[1]")
-                    pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
-                    pagefulltext = re.findall(pattern11, pagefulltr.text)
-                    pagetext = str(pagefulltext[0])
-                    maxnum = pagetext.split()[-1]
-                    if int(maxnum) <= 100:
+                    bMutex.unlock()
+                    # pattern11 = re.compile(r'Orders \d+ to \d+')
+                    # pagefulltext = re.findall(pattern11, pagefulltr.text)
+                    # pagetext = str(pagefulltext[0])
+                    # maxnum = pagetext.split()[-1]
+                    # print("pagenumberget:" + str(time.clock()))
+                    # bMutex.unlock()
+                    # if int(maxnum) <= 100:
+                    if 'of' not in pagefulltr.text:
                         onepageflag = 1
                         print('onegage!')
                         break
@@ -137,31 +146,41 @@ def getlist(driver0):
                 orderlisthtml = wait.WebDriverWait(driver0, 10000000).until(
                     EC.presence_of_element_located((By.ID, 'myo-table')))
                 orderlist = []
-                allordertr = driver0.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
+                datelist = []
+                timelist = []
+                allordertr = driver0.find_elements_by_xpath(
+                    "//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
                 for i in allordertr:
                     orderid = str(i.get_attribute('id'))[-19:]
+                    if re.match(re.compile('\d{3}-\d{7}-\d{7}'),orderid) == None:
+                        continue
                     orderlist.append(orderid)
+                    datetd = i.find_element_by_xpath("./td[2]")
+                    # print(datetd.text)
+                    thisdate = str(datetd.text).split('\n')
+                    datelist.append(thisdate[0])
+                    timelist.append(thisdate[1][:-4])
                 # pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
                 # orderlist = re.findall(pattern, orderlisthtml.text)
 
                 # orderinfolist = []
+                print("allorderget:" + str(time.clock()))
 
-                datelist = []
-                timelist = []
-                for i in orderlist:
-                    currentordertable = driver0.find_element_by_id('row-' + i)
-                    pattern1 = re.compile(r'\w{3} \d{1,2}, \d{4}')
-                    thisdate = re.findall(pattern1, currentordertable.text)
-                    datelist.append(thisdate[0])
-
-                    pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
-                    thistime = re.findall(pattern2, currentordertable.text)
-                    timelist.append(thistime[0])
-                    #
-                    # orderinfolist.append(getorderinfo(driver0,i))
+                # for i in orderlist:
+                #     currentordertable = driver0.find_element_by_id('row-' + i)
+                #     pattern1 = re.compile(r'\w{3} \d{1,2}, \d{4}')
+                #     thisdate = re.findall(pattern1, currentordertable.text)
+                #     datelist.append(thisdate[0])
+                #
+                #     pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
+                #     thistime = re.findall(pattern2, currentordertable.text)
+                #     timelist.append(thistime[0])
+                #
+                # orderinfolist.append(getorderinfo(driver0,i))
                 bMutex.unlock()
                 #     把这一页的信息加入
                 allorderlist.extend(orderlist)
+                print("alldateget:" + str(time.clock()))
                 # print(orderinfolist)
                 # allorderinfolist.extend(orderinfolist)
                 for i, j in zip(datelist, timelist):
@@ -191,6 +210,7 @@ def getlist(driver0):
             bMutex.unlock()
             # traceback.print_exc()
             print("finish to get orderID---------------------")
+            print("finish:" + str(time.clock()))
             break
     return allorderlist, alldatetimelist
 
@@ -217,20 +237,67 @@ def getcurrent(driver0, orderid):
             bMutex.unlock()
             traceback.print_exc()
             print('try again--------------------')
+
     try:
         # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
         time.sleep(2)
         bMutex.lock()
-        wait.WebDriverWait(driver0, 3).until(
+        idDom = wait.WebDriverWait(driver0, 3).until(
             EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-        current = driver0.find_element_by_id('currentThreadSenderId').get_attribute('value')
+        current = idDom.get_attribute('value')
         bMutex.unlock()
         return current
     except Exception as e:
         # traceback.print_exc()
+
         bMutex.unlock()
         print('No result found, ready to send message')
         return None
+
+def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
+    while True:
+        while True:
+            try:
+                bMutex.lock()
+                wait.WebDriverWait(driver0, 5).until(
+                    EC.presence_of_element_located((By.ID, 'search-text-box')))
+                idinput = driver0.find_element_by_id("search-text-box")
+                searchbutton = driver0.find_element_by_name("Search")
+                # idinput.clear()
+                # idinput.send_keys(orderid)
+                driver0.execute_script("arguments[0].value=" + "'" + orderid + "'", idinput)
+                driver0.execute_script('arguments[0].click();', searchbutton)
+                # searchbutton.click()
+                # 只有不出现任何问题，才能继续，否则重新来一遍
+                bMutex.unlock()
+                break
+            except Exception as e:
+                bMutex.unlock()
+                traceback.print_exc()
+                print('try again--------------------')
+
+        try:
+            # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
+            bMutex.lock()
+            idDom = wait.WebDriverWait(driver0, 3).until(
+                EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+            current = idDom.get_attribute('value')
+            orderidA = wait.WebDriverWait(driver0, 3).until(
+                EC.presence_of_element_located((By.ID, 'spaui-home')))
+            thisorderid = str(orderidA.get_attribute('href'))[-20:-1]
+            bMutex.unlock()
+            if current != lastcurrentid:
+                if thisorderid != lastorderid:
+                    return current
+        except Exception as e:
+            # traceback.print_exc()
+            nomessagespan = wait.WebDriverWait(driver0, 3).until(
+                EC.presence_of_element_located((By.ID, 'default-no-message-text')))
+            nomes = str(nomessagespan.get_attribute('class'))[-7:]
+            bMutex.unlock()
+            if nomes == 'visible':
+                print('No result found, ready to send message')
+                return None
 
 
 def writeExcel(current, order, dateList):
@@ -245,7 +312,9 @@ def writeExcel(current, order, dateList):
     #                 str(lastDay.month)+'-'+str(lastDay.day)+'.xls'
     # except:
     now = datetime.now()
-    excelName = '%d-%d-%d_%d.xls' % (now.month, now.day, now.hour, now.minute)
+    startDate = dateList[-1]
+    endDate = dateList[0]
+    excelName = '%d-%d_%d-%d.xls' % (startDate.month,startDate.day,endDate.month,endDate.day)
 
     # excelname = 'searchResult.xls'
 
