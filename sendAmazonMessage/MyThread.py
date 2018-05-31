@@ -168,10 +168,12 @@ class searchClickedThread(QtCore.QThread):
             # allIDText.close()
             # t = open('searchSentID.txt','w')
             # t.close()
+            lastCurrent = 0
+            lastOrder = 0
             for i in self.window.orderList:
                 # sendIDText = open('searchSentID.txt', 'a')
                 while True:
-                    get = tool.getcurrent(self.window.driver, i)
+                    get = tool.getcurrent2(self.window.driver, i,lastcurrentid=lastCurrent,lastorderid=lastOrder)
                     if get == None:
                         #                 说明没搜索到呀，那么就要给他发信
                         send.sendMessage(send.generateSendMessageUrl(i), self.window.modelText, self.window.driver, i)
@@ -183,6 +185,8 @@ class searchClickedThread(QtCore.QThread):
                         self.window.currentThreadSenderList.append(get)
                         # sendIDText.write(i+'     '+get+'\n')
                         # sendIDText.close()
+                        lastOrder = i
+                        lastCurrent = get
                         break
 
                 self.window.s.addLogItemSignal.emit('Order ID:' + str(i) + '\nCurrentThreadSenderID:' + str(get))
