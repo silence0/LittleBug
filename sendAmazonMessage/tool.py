@@ -286,9 +286,8 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 EC.presence_of_element_located((By.ID, 'spaui-home')))
             thisorderid = str(orderidA.get_attribute('href'))[-20:-1]
             bMutex.unlock()
-            if current != lastcurrentid:
-                if thisorderid != lastorderid:
-                    return current
+            if thisorderid != lastorderid:
+                return current
         except Exception as e:
             # traceback.print_exc()
             nomessagespan = wait.WebDriverWait(driver0, 3).until(
