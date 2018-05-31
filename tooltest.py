@@ -73,7 +73,8 @@ def getlist(driver0):
 # Configurations on Mac
 # url = r'file:///Users/djc/Downloads/4_files/7.html'
 print("start:" + str(time.clock()))
-url = r'file:///Users/djc/Desktop/spider/Manage%20Orders%20-%20Amazon.html'
+# url = r'file:///Users/djc/Desktop/spider/Manage%20Orders%20-%20Amazon.html'
+url = r'file:///Users/djc/Desktop/spider/succ.html?cs=39426419&fi=RESPONSE_NEEDED'
 excelUrl = r'/Users/djc/Desktop/test1.xls'
 
 driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')
@@ -96,40 +97,50 @@ driver.get(url)
 # AllOrderList, Alldatetimelist = getlist(driver)
 
 
+orderidA = wait.WebDriverWait(driver, 3).until(
+    EC.presence_of_element_located((By.ID, 'spaui-home')))
+thisorderid = str(orderidA.get_attribute('href'))[-20:-1]
+print(thisorderid)
+oriii = '111-2300471-3237033'
+if thisorderid == oriii:
+    print('11111111111')
 
-
-
+nomessagespan = wait.WebDriverWait(driver, 3).until(
+    EC.presence_of_element_located((By.ID, 'no-response-required-text')))
+nomes = str(nomessagespan.get_attribute('class'))[-7:]
+if nomes == 'visible':
+    print("ssssssss")
 
 
 # str1 = 'May 9, 2018 4:04:55 PM'
 # dt = datetime.strptime(str1, "%b %d, %Y %I:%M:%S %p")
 # print(dt)
 
-orderlisthtml = wait.WebDriverWait(driver, 10000000).until(EC.presence_of_element_located((By.ID, 'myo-table')))
-print("html ready:" + str(time.clock()))
-pagefulltr = driver.find_element_by_xpath("//div[@id='myo-table']/table/tbody/tr[1]")
-pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
-pagefulltext = re.findall(pattern11, pagefulltr.text)
-pagetext = str(pagefulltext[0])
-maxnum = pagetext.split()[-1]
-print("pagenumber get:" + str(time.clock()))
-print(maxnum)
-orderlist = []
-datelist = []
-timelist = []
-allordertr = driver.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
-
-for i in allordertr:
-    orderid = str(i.get_attribute('id'))[-19:]
-    orderlist.append(orderid)
-    datetd = i.find_element_by_xpath("./td[2]")
-    # print(datetd.text)
-    thisdate = str(datetd.text).split('\n')
-    datelist.append(thisdate[0])
-    timelist.append(thisdate[1])
-print(orderlist)
-print(len(orderlist))
-print("all order and date get:" + str(time.clock()))
+# orderlisthtml = wait.WebDriverWait(driver, 10000000).until(EC.presence_of_element_located((By.ID, 'myo-table')))
+# print("html ready:" + str(time.clock()))
+# pagefulltr = driver.find_element_by_xpath("//div[@id='myo-table']/table/tbody/tr[1]")
+# pattern11 = re.compile(r'Orders \d+ - \d+ of \d+')
+# pagefulltext = re.findall(pattern11, pagefulltr.text)
+# pagetext = str(pagefulltext[0])
+# maxnum = pagetext.split()[-1]
+# print("pagenumber get:" + str(time.clock()))
+# print(maxnum)
+# orderlist = []
+# datelist = []
+# timelist = []
+# allordertr = driver.find_elements_by_xpath("//div[@id='myo-table']/table/tbody/tr[contains(@id,'row-')]")
+#
+# for i in allordertr:
+#     orderid = str(i.get_attribute('id'))[-19:]
+#     orderlist.append(orderid)
+#     datetd = i.find_element_by_xpath("./td[2]")
+#     # print(datetd.text)
+#     thisdate = str(datetd.text).split('\n')
+#     datelist.append(thisdate[0])
+#     timelist.append(thisdate[1])
+# print(orderlist)
+# print(len(orderlist))
+# print("all order and date get:" + str(time.clock()))
 
 # for i in orderlist:
 #     currentordertable = driver.find_element_by_id('row-' + i)
@@ -144,7 +155,7 @@ print("all order and date get:" + str(time.clock()))
 #     #
 #     # orderinfolist.append(getorderinfo(driver0,i))
 # #     把这一页的信息加入
-print("alldateget:" + str(time.clock()))
+# print("alldateget:" + str(time.clock()))
 # orderinfo = driver.find_elements_by_xpath("//span[contains(@id,'___product')]")
 # info_a = driver.find_element_by_xpath("//a[contains(@href,'orderId=111-2389060-6443420')]")
 # info_a = driver.find_element_by_link_text("111-2389060-6443420")
