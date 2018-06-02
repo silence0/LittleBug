@@ -279,7 +279,7 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
         try:
             # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
             bMutex.lock()
-            if lastorderid == 1:
+            if lastorderid == 0:
                 time.sleep(4)
                 idDom = wait.WebDriverWait(driver0, 30).until(
                     EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
