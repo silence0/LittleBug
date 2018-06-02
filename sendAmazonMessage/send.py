@@ -176,6 +176,13 @@ def sendMessage2(sendMessageUrl, modelStr, driver,orderid):
             print('send OK')
             return name
         except Exception as e:
+            # 关闭当前窗口B
+
+            driver.close()
+
+            # 切换回窗口A
+
+            driver.switch_to_window(handles[0])
             bMutex.unlock()
             traceback.print_exc()
             print('try send again----------------------')
