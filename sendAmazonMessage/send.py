@@ -127,7 +127,7 @@ def sendMessage2(sendMessageUrl, modelStr, driver,orderid):
             bMutex.unlock()
 
             if len(productname) > 80:
-                productname = tool.getorderinfo2(driver,orderid)
+                productname = tool.getorderinfo3(driver,orderid)
 
             # 对model进行智能处理
             patternOrderid = re.compile(r'#orderid')

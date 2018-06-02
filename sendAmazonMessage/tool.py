@@ -82,6 +82,37 @@ def getorderinfo2(driver0, orderid):
     bMutex.unlock()
     return o1
 
+def getorderinfo3(driver0, orderid):
+    bMutex.lock()
+    js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
+    handle = driver0.current_window_handle
+    driver0.execute_script(js)
+
+    handles = driver0.window_handles
+    for newhandle in handles:
+
+        # 筛选新打开的窗口B
+
+        if newhandle != handle:
+            # 切换到新打开的窗口B
+
+            driver0.switch_to_window(newhandle)
+
+    # 在新打开的窗口B中操作
+    wait.WebDriverWait(driver0, 10000000).until(
+        EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
+    o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+
+    # 关闭当前窗口B
+
+    driver0.close()
+
+    # 切换回窗口A
+
+    driver0.switch_to_window(handles[1])
+    bMutex.unlock()
+    return o1
+
 
 def getlist(driver0):
     allorderlist = []
