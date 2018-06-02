@@ -73,12 +73,18 @@ def getlist(driver0):
 # Configurations on Mac
 # url = r'file:///Users/djc/Downloads/4_files/7.html'
 print("start:" + str(time.clock()))
+
+
+if '1111' == 0:
+    print('1111')
+
+
 # url = r'file:///Users/djc/Desktop/spider/Manage%20Orders%20-%20Amazon.html'
 url = r'file:///Users/djc/Desktop/spider/%E7%94%A8%E6%89%80%E9%80%89%E9%A1%B9%E7%9B%AE%E6%96%B0%E5%BB%BA%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B9/succ.html?cs=39426419&fi=RESPONSE_NEEDED'
 excelUrl = r'/Users/djc/Desktop/test1.xls'
-
-driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')
-print("chrome ready:" + str(time.clock()))
+#
+# driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')
+# print("chrome ready:" + str(time.clock()))
 
 # Configurations on Windows
 # url = r'https://sellercentral.amazon.com/messaging/inbox'
@@ -92,8 +98,8 @@ print("chrome ready:" + str(time.clock()))
 # driver = webdriver.Chrome(executable_path=path, options=cOptions)
 
 
-print('ok?')
-driver.get(url)
+# print('ok?')
+# driver.get(url)
 # AllOrderList, Alldatetimelist = getlist(driver)
 
 
@@ -105,10 +111,10 @@ driver.get(url)
 # if thisorderid == oriii:
 #     print('11111111111')
 
-nomessagespan = wait.WebDriverWait(driver, 3).until(
-    EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='https://sellercentral.amazon.com/gp/communication-manager/i']")))
-
-print(nomessagespan.text)
+# nomessagespan = wait.WebDriverWait(driver, 3).until(
+#     EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='https://sellercentral.amazon.com/gp/communication-manager/i']")))
+#
+# print(nomessagespan.text)
 
 # nomes = str(nomessagespan.get_attribute('class'))[-7:]
 # if nomes == 'visible':

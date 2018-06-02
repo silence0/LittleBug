@@ -285,6 +285,7 @@ def getcurrent(driver0, orderid):
         print('No result found, ready to send message')
         return None
 
+
 def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
 
         while True:
@@ -313,20 +314,22 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 bMutex.lock()
                 idDom = wait.WebDriverWait(driver0, 3).until(
                         EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-                current = idDom.get_attribute('value')
+                current = str(idDom.get_attribute('value'))
                 bMutex.unlock()
                 if current == lastcurrentid:
+                    bMutex.lock()
                     orderidA = wait.WebDriverWait(driver0, 3).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='/gp/orders-v2/details?ie=UTF8&orderID=']")))
-                    thisorderid = orderidA.text
-                    if thisorderid != lastorderid:
+                    bMutex.unlock()
+                    thisorderid = str(orderidA.get_attribute('href')[-19:])
+                    if thisorderid == orderid:
                         return current
                 else:
                     return current
             except Exception as e:
                 # traceback.print_exc()
                 try:
-                    orderitem = wait.WebDriverWait(driver0, 3).until(
+                    wait.WebDriverWait(driver0, 3).until(
                         EC.presence_of_element_located((By.CLASS_NAME, 'click-thread')))
                     bMutex.unlock()
                 except Exception as ee:

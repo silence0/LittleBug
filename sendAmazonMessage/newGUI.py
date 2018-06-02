@@ -151,7 +151,7 @@ class MyMainWindow(QFrame):
         self.selectDateUrl = r'https://sellercentral.amazon.com/gp/orders-v2/search/ref=ag_myosearch_apsearch_myo'
         # self.selectDateUrl = r'file:///C:/Users/60913/Desktop/4_files/7.html'
         # self.getOrderListUrl = r'file:///C:/Users/60913/Desktop/4_files/2.html'
-        self.getThreadUrl = r'https://sellercentral.amazon.com/messaging/inbox/ref=ag_cmin_head_xx'
+        self.getThreadUrl = r'https://sellercentral.amazon.com/messaging/inbox/ref=ag_cmin_head_xx?cs=-1921262559&ct=3965877866687456622&fi=ALL&pn=1'
         # self.driver = webdriver.Chrome(executable_path=driverPath, options=chromeOptions)
 
     def getModelInputWidget(self):
