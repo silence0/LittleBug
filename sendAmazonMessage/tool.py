@@ -279,8 +279,13 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
         try:
             # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
             bMutex.lock()
-            idDom = wait.WebDriverWait(driver0, 3).until(
-                EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+            if lastorderid == 1:
+                time.sleep(4)
+                idDom = wait.WebDriverWait(driver0, 30).until(
+                    EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+            else:
+                idDom = wait.WebDriverWait(driver0, 3).until(
+                    EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
             current = idDom.get_attribute('value')
             orderidA = wait.WebDriverWait(driver0, 3).until(
                 EC.presence_of_element_located((By.ID, 'spaui-home')))
@@ -290,11 +295,12 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 return current
         except Exception as e:
             # traceback.print_exc()
-            nomessagespan = wait.WebDriverWait(driver0, 3).until(
-                EC.presence_of_element_located((By.ID, 'default-no-message-text')))
-            nomes = str(nomessagespan.get_attribute('class'))[-7:]
-            bMutex.unlock()
-            if nomes == 'visible':
+            try:
+                orderitem = wait.WebDriverWait(driver0, 3).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, 'click-thread')))
+                bMutex.unlock()
+            except Exception as ee:
+                bMutex.unlock()
                 print('No result found, ready to send message')
                 return None
 
