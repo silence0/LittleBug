@@ -286,7 +286,7 @@ def getcurrent(driver0, orderid):
         return None
 
 def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
-    while True:
+
         while True:
             try:
                 bMutex.lock()
@@ -307,36 +307,32 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 traceback.print_exc()
                 print('try again--------------------')
 
-        try:
-            # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
-            bMutex.lock()
-            if lastorderid == 0:
-                time.sleep(4)
-                idDom = wait.WebDriverWait(driver0, 30).until(
-                    EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-            else:
+        while True:
+            try:
+                # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
+                bMutex.lock()
                 idDom = wait.WebDriverWait(driver0, 3).until(
-                    EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-            current = idDom.get_attribute('value')
-            orderidA = wait.WebDriverWait(driver0, 3).until(
-                EC.presence_of_element_located((By.ID, 'spaui-home')))
-            thisorderid = str(orderidA.get_attribute('href'))[-20:-1]
-            bMutex.unlock()
-            if current == lastcurrentid:
+                        EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+                current = idDom.get_attribute('value')
+                bMutex.unlock()
+                if current == lastcurrentid:
+                    orderidA = wait.WebDriverWait(driver0, 3).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='/gp/orders-v2/details?ie=UTF8&orderID=']")))
+                    thisorderid = orderidA.text
                     if thisorderid != lastorderid:
                         return current
-            else:
-                return current
-        except Exception as e:
-            # traceback.print_exc()
-            try:
-                orderitem = wait.WebDriverWait(driver0, 3).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, 'click-thread')))
-                bMutex.unlock()
-            except Exception as ee:
-                bMutex.unlock()
-                print('No result found, ready to send message')
-                return None
+                else:
+                    return current
+            except Exception as e:
+                # traceback.print_exc()
+                try:
+                    orderitem = wait.WebDriverWait(driver0, 3).until(
+                        EC.presence_of_element_located((By.CLASS_NAME, 'click-thread')))
+                    bMutex.unlock()
+                except Exception as ee:
+                    bMutex.unlock()
+                    print('No result found, ready to send message')
+                    return None
 
 
 def writeExcel(current, order, dateList):

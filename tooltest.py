@@ -74,7 +74,7 @@ def getlist(driver0):
 # url = r'file:///Users/djc/Downloads/4_files/7.html'
 print("start:" + str(time.clock()))
 # url = r'file:///Users/djc/Desktop/spider/Manage%20Orders%20-%20Amazon.html'
-url = r'file:///Users/djc/Desktop/spider/succ.html?cs=39426419&fi=RESPONSE_NEEDED'
+url = r'file:///Users/djc/Desktop/spider/%E7%94%A8%E6%89%80%E9%80%89%E9%A1%B9%E7%9B%AE%E6%96%B0%E5%BB%BA%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B9/succ.html?cs=39426419&fi=RESPONSE_NEEDED'
 excelUrl = r'/Users/djc/Desktop/test1.xls'
 
 driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')
@@ -97,19 +97,22 @@ driver.get(url)
 # AllOrderList, Alldatetimelist = getlist(driver)
 
 
-orderidA = wait.WebDriverWait(driver, 3).until(
-    EC.presence_of_element_located((By.ID, 'spaui-home')))
-thisorderid = str(orderidA.get_attribute('href'))[-20:-1]
-print(thisorderid)
-oriii = '111-2300471-3237033'
-if thisorderid == oriii:
-    print('11111111111')
+# orderidA = wait.WebDriverWait(driver, 3).until(
+#     EC.presence_of_element_located((By.ID, 'spaui-home')))
+# thisorderid = str(orderidA.get_attribute('href'))[-20:-1]
+# print(thisorderid)
+# oriii = '111-2300471-3237033'
+# if thisorderid == oriii:
+#     print('11111111111')
 
 nomessagespan = wait.WebDriverWait(driver, 3).until(
-    EC.presence_of_element_located((By.ID, 'no-response-required-text')))
-nomes = str(nomessagespan.get_attribute('class'))[-7:]
-if nomes == 'visible':
-    print("ssssssss")
+    EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='https://sellercentral.amazon.com/gp/communication-manager/i']")))
+
+print(nomessagespan.text)
+
+# nomes = str(nomessagespan.get_attribute('class'))[-7:]
+# if nomes == 'visible':
+#     print("ssssssss")
 
 
 # str1 = 'May 9, 2018 4:04:55 PM'
