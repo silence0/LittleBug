@@ -178,7 +178,7 @@ class searchClickedThread(QtCore.QThread):
                         #                 说明没搜索到呀，那么就要给他发信
                         send.sendMessage2(send.generateSendMessageUrl(i), self.window.modelText, self.window.driver, i)
                         bMutex.lock()
-                        self.window.driver.get(self.window.getThreadUrl)
+                        # self.window.driver.get(self.window.getThreadUrl)
                         bMutex.unlock()
                     else:
                         #                     说明搜索到了，那么这个信件就不用重新发了
