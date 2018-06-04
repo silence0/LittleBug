@@ -5,7 +5,7 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from selenium import webdriver
-
+import os.path
 from MyThread import searchClickedThread, sendByIDClickedThread, sendByDateClickedThread, mySingal, testThread
 from VAR import bMutex
 
@@ -136,18 +136,25 @@ class MyMainWindow(QFrame):
     def addLogItemSlot(self, a):
         self.rightFrame.logEdit.setText(a)
 
+    def getProfilePath(self):
+        userName = getpass.getuser()
+        basePath = r'C:\Users\%s\AppData\Roaming\Mozilla\Firefox\Profiles' % userName
+        t = os.listdir(basePath)
+        profileName = ''
+        for i in t:
+            if 'default' in i:
+                profileName = i
+                break
+        pa = os.path.join(basePath, profileName)
+        print(pa)
+        return pa
     def initPath(self):
-        self.driverBasePath = r'C:\Program Files (x86)\Google\Chrome\Application'
-        # self.driverBasePath = r'D:\userdata'
-        self.driverPath = os.path.join(self.driverBasePath, 'bindriver.exe')
+        self.driverBasePath = 'd:\\'
+        self.driverPath = os.path.join(self.driverBasePath, 'geckodriver.exe')
 
-        userDatePath = r'C:\Users\%s\AppData\Local\Google\Chrome\User Data' % (getpass.getuser())
+        self.profilePath = self.getProfilePath()
+        self.profile = webdriver.FirefoxProfile(self.profilePath)
 
-        # userDatePath = r'D:\userdata'
-        self.chromeOptions = webdriver.ChromeOptions()
-        self.chromeOptions.add_argument(r'user-data-dir=' + userDatePath)
-
-        # self.sendMessageUrl = r'file:///C:/Users/60913/Desktop/4_files/6.html'
         self.selectDateUrl = r'https://sellercentral.amazon.com/gp/orders-v2/search/ref=ag_myosearch_apsearch_myo'
         # self.selectDateUrl = r'file:///C:/Users/60913/Desktop/4_files/7.html'
         # self.getOrderListUrl = r'file:///C:/Users/60913/Desktop/4_files/2.html'
