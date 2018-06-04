@@ -312,17 +312,17 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
             try:
                 # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
                 bMutex.lock()
-                idDom = wait.WebDriverWait(driver0, 3).until(
-                        EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-                current = str(idDom.get_attribute('value'))
-                bMutex.unlock()
-                if current == lastcurrentid:
-                    bMutex.lock()
-                    orderidA = wait.WebDriverWait(driver0, 3).until(
+                orderidA = wait.WebDriverWait(driver0, 3).until(
                         EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='/gp/orders-v2/details?ie=UTF8&orderID=']")))
+                thisorderid = str(orderidA.get_attribute('href')[-19:])
+                bMutex.unlock()
+                if thisorderid == orderid:
+                    bMutex.lock()
+                    idDom = wait.WebDriverWait(driver0, 3).until(
+                        EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+                    current = str(idDom.get_attribute('value'))
                     bMutex.unlock()
-                    thisorderid = str(orderidA.get_attribute('href')[-19:])
-                    if thisorderid == orderid:
+                    if current != lastcurrentid:
                         return current
                 else:
                     return current
