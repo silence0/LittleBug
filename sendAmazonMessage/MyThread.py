@@ -36,8 +36,7 @@ class sendByDateClickedThread(QtCore.QThread):
     def run(self):
         try:
             bMutex.lock()
-            self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
-                                                  options=self.window.chromeOptions)
+            self.window.driver = webdriver.Firefox(executable_path=self.window.driverPath,firefox_profile=self.window.profile)
             self.window.setDriver(self.window.driver)
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
             # 先把之前生成的发送情况给清除掉
@@ -90,8 +89,7 @@ class sendByIDClickedThread(QtCore.QThread):
     def run(self):
         try:
             bMutex.lock()
-            self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
-                                                  options=self.window.chromeOptions)
+            self.window.driver = webdriver.Firefox(executable_path=self.window.driverPath,firefox_profile=self.window.profile)
             self.window.setDriver(self.window.driver)
             bMutex.unlock()
 
@@ -145,8 +143,9 @@ class searchClickedThread(QtCore.QThread):
         try:
             bMutex.lock()
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
-            self.window.driver = webdriver.Chrome(executable_path=self.window.driverPath,
-                                                  options=self.window.chromeOptions)
+            # print(self.window.profilePath)
+            # profile = webdriver.FirefoxProfile(self.window.profilePath)
+            self.window.driver = webdriver.Firefox(executable_path=self.window.driverPath,firefox_profile=self.window.profile)
             self.window.setDriver(self.window.driver)
             self.window.driver.get(self.window.selectDateUrl)
             bMutex.unlock()

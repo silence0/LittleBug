@@ -94,7 +94,7 @@ def getlist(driver0):
         EC.visibility_of_element_located((By.CSS_SELECTOR, "select[name='itemsPerPage']")))
     selectPagPer = select.Select(driver0.find_elements_by_name('itemsPerPage')[-1])
     selectPagPer.select_by_value('100')
-    assert isinstance(driver0, webdriver.Chrome)
+    # assert isinstance(driver0, webdriver.Chrome)
     goButton = driver0.find_elements_by_css_selector("input[type='image'][width='21'")
     goButton = goButton[-1]
     goButton.click()
