@@ -287,7 +287,7 @@ def getcurrent(driver0, orderid):
 
 
 def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
-
+        abnormity = 0
         while True:
             try:
                 bMutex.lock()
@@ -326,6 +326,10 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                         current = str(idDom.get_attribute('value'))
                         bMutex.unlock()
                         return current
+                    else:
+                        abnormity += 1
+                        if abnormity > 5:
+                            return 'abnormal'
                 else:
                     return current
             except Exception as e:
@@ -340,7 +344,7 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                     return None
 
 
-def writeExcel(current, order, dateList):
+def writeExcelAndAbnormalId(current, order, dateList,abnormalIdList):
     # excelname = str(month) + '-' + str(day) + 'to' + str(month2) + '-' + str(day2) + '.xls'
     # excelName = 'result.xls'
     # try:
@@ -375,4 +379,8 @@ def writeExcel(current, order, dateList):
         # sheet.write(n, 3, t)
         n += 1
 
+    f = open('AbnormalId.txt', 'w')
+    for i in abnormalIdList:
+        f.write(i + '\n')
+    f.close()
     book.save(excelurl)  # 在字符串前加r，声明为raw字符串，这样就不会处理其中的转义了。否则，可能会报错

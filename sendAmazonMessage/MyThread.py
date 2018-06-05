@@ -169,6 +169,7 @@ class searchClickedThread(QtCore.QThread):
             # t.close()
             lastCurrent = 0
             lastOrder = 0
+            abnormalID = []
             for i in self.window.orderList:
                 # sendIDText = open('searchSentID.txt', 'a')
                 while True:
@@ -179,6 +180,8 @@ class searchClickedThread(QtCore.QThread):
                         bMutex.lock()
                         self.window.driver.get(self.window.getThreadUrl)
                         bMutex.unlock()
+                    elif get == 'abnormal':
+                        abnormalID.append(i)
                     else:
                         #                     说明搜索到了，那么这个信件就不用重新发了
                         self.window.currentThreadSenderList.append(get)
@@ -192,7 +195,7 @@ class searchClickedThread(QtCore.QThread):
                 completedIndex = completedIndex + 1
                 self.window.s.scheduleSignal.emit(str(completedIndex) + r'/' + orderSizeStr)
 
-            tool.writeExcel(self.window.currentThreadSenderList, self.window.orderList, self.window.dateList)
+            tool.writeExcelAndAbnormalId(self.window.currentThreadSenderList, self.window.orderList, self.window.dateList, abnormalID)
             self.window.driver.close()
 
             self.window.s.informationSignal.emit('information', 'completed successfully')
