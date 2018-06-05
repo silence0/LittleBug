@@ -109,7 +109,7 @@ def getorderinfo3(driver0, orderid):
 
     # 切换回窗口A
 
-    driver0.switch_to_window(handles[1])
+    driver0.switch_to_window(handle)
     bMutex.unlock()
     return o1
 
@@ -308,9 +308,7 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 traceback.print_exc()
                 print('try again--------------------')
 
-        while True:
             try:
-                # 等5秒，如果还没搜出来结果，那么肯定就是没有了，返回None
                 bMutex.lock()
                 idDom = wait.WebDriverWait(driver0, 3).until(
                         EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
