@@ -302,7 +302,6 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 # searchbutton.click()
                 # 只有不出现任何问题，才能继续，否则重新来一遍
                 bMutex.unlock()
-                break
             except Exception as e:
                 bMutex.unlock()
                 traceback.print_exc()
