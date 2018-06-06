@@ -314,22 +314,30 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 current = str(idDom.get_attribute('value'))
                 bMutex.unlock()
                 if current == lastcurrentid:
-                    bMutex.lock()
-                    orderidA = wait.WebDriverWait(driver0, 3).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='/gp/orders-v2/details?ie=UTF8&orderID=']")))
-                    thisorderid = str(orderidA.get_attribute('href')[-19:])
-                    bMutex.unlock()
-                    if thisorderid == orderid:
+
+                    try:
                         bMutex.lock()
-                        idDom = wait.WebDriverWait(driver0, 3).until(
-                            EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-                        current = str(idDom.get_attribute('value'))
+                        orderidA = wait.WebDriverWait(driver0, 3).until(
+                            EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='/gp/orders-v2/details?ie=UTF8&orderID=']")))
+                        thisorderid = str(orderidA.get_attribute('href')[-19:])
                         bMutex.unlock()
-                        return current
-                    else:
+                        if thisorderid == orderid:
+                            bMutex.lock()
+                            idDom = wait.WebDriverWait(driver0, 3).until(
+                                EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+                            current = str(idDom.get_attribute('value'))
+                            bMutex.unlock()
+                            return current
+                        else:
+                            abnormity += 1
+                            if abnormity > 5:
+                                return 'abnormal'
+                    except Exception as e0:
+                        bMutex.unlock()
                         abnormity += 1
                         if abnormity > 5:
                             return 'abnormal'
+
                 else:
                     return current
             except Exception as e:
