@@ -331,13 +331,13 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                             return current
                         else:
                             abnormity += 1
-                            print("abnormal:" + abnormity)
+                            print("abnormal:" + str(abnormity))
                             if abnormity > 5:
                                 return 'abnormal'
                     except Exception as e0:
                         bMutex.unlock()
                         abnormity += 1
-                        print("abnormal2:" + abnormity)
+                        print("abnormal2:" + str(abnormity))
                         if abnormity > 5:
                             return 'abnormal'
 
