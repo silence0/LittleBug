@@ -287,72 +287,74 @@ def getcurrent(driver0, orderid):
 
 
 def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
-        abnormity = 0
-        while True:
-            try:
-                bMutex.lock()
-                wait.WebDriverWait(driver0, 5).until(
-                    EC.presence_of_element_located((By.ID, 'search-text-box')))
-                idinput = driver0.find_element_by_id("search-text-box")
-                searchbutton = driver0.find_element_by_name("Search")
-                # idinput.clear()
-                # idinput.send_keys(orderid)
-                driver0.execute_script("arguments[0].value=" + "'" + orderid + "'", idinput)
-                driver0.execute_script('arguments[0].click();', searchbutton)
-                # searchbutton.click()
-                # 只有不出现任何问题，才能继续，否则重新来一遍
-                bMutex.unlock()
-            except Exception as e:
-                bMutex.unlock()
-                traceback.print_exc()
-                continue
-                print('try again--------------------')
+    abnormity = 0
+    while True:
+        try:
+            bMutex.lock()
+            wait.WebDriverWait(driver0, 5).until(
+                EC.presence_of_element_located((By.ID, 'search-text-box')))
+            idinput = driver0.find_element_by_id("search-text-box")
+            searchbutton = driver0.find_element_by_name("Search")
+            # idinput.clear()
+            # idinput.send_keys(orderid)
+            driver0.execute_script("arguments[0].value=" + "'" + orderid + "'", idinput)
+            driver0.execute_script('arguments[0].click();', searchbutton)
+            # searchbutton.click()
+            # 只有不出现任何问题，才能继续，否则重新来一遍
+            bMutex.unlock()
+        except Exception as e:
+            bMutex.unlock()
+            traceback.print_exc()
+            continue
+            print('try again--------------------')
 
-            try:
-                bMutex.lock()
-                idDom = wait.WebDriverWait(driver0, 3).until(
-                        EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-                current = str(idDom.get_attribute('value'))
-                bMutex.unlock()
-                if current == lastcurrentid:
+        try:
+            bMutex.lock()
+            idDom = wait.WebDriverWait(driver0, 3).until(
+                    EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+            current = str(idDom.get_attribute('value'))
+            bMutex.unlock()
+            if current == lastcurrentid:
 
-                    try:
-                        bMutex.lock()
-                        orderidA = wait.WebDriverWait(driver0, 3).until(
-                            EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='/gp/orders-v2/details?ie=UTF8&orderID=']")))
-                        thisorderid = str(orderidA.get_attribute('href')[-19:])
-                        bMutex.unlock()
-                        if thisorderid == orderid:
-                            bMutex.lock()
-                            idDom = wait.WebDriverWait(driver0, 3).until(
-                                EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
-                            current = str(idDom.get_attribute('value'))
-                            bMutex.unlock()
-                            return current
-                        else:
-                            abnormity += 1
-                            print("abnormal:" + str(abnormity))
-                            if abnormity > 5:
-                                return 'abnormal'
-                    except Exception as e0:
-                        bMutex.unlock()
-                        abnormity += 1
-                        print("abnormal2:" + str(abnormity))
-                        if abnormity > 5:
-                            return 'abnormal'
-
-                else:
-                    return current
-            except Exception as e:
-                # traceback.print_exc()
                 try:
-                    wait.WebDriverWait(driver0, 3).until(
-                        EC.presence_of_element_located((By.CLASS_NAME, 'click-thread')))
+                    bMutex.lock()
+                    orderidA = wait.WebDriverWait(driver0, 3).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, "a[href^='/gp/orders-v2/details?ie=UTF8&orderID=']")))
+                    thisorderid = str(orderidA.get_attribute('href')[-19:])
                     bMutex.unlock()
-                except Exception as ee:
+                    if thisorderid == orderid:
+                        bMutex.lock()
+                        idDom = wait.WebDriverWait(driver0, 3).until(
+                            EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
+                        current = str(idDom.get_attribute('value'))
+                        bMutex.unlock()
+                        return current
+                    else:
+                        abnormity += 1
+                        print("abnormal:" + str(abnormity))
+                        if abnormity > 10:
+                            print("Abnormal!!!!!!!!")
+                            return 'abnormal'
+                except Exception as e0:
                     bMutex.unlock()
-                    print('No result found, ready to send message')
-                    return None
+                    abnormity += 1
+                    print("abnormal2:" + str(abnormity))
+                    if abnormity > 10:
+                        print("Abnormal!!!!!!!!")
+                        return 'abnormal'
+
+            else:
+                return current
+        except Exception as e:
+            # traceback.print_exc()
+            try:
+                wait.WebDriverWait(driver0, 3).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, 'click-thread')))
+                bMutex.unlock()
+            except Exception as ee:
+                bMutex.unlock()
+                print('No result found, ready to send message')
+                return None
 
 
 def writeExcelAndAbnormalId(current, order, dateList,abnormalIdList):

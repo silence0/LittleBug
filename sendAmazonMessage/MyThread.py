@@ -181,6 +181,7 @@ class searchClickedThread(QtCore.QThread):
                         self.window.driver.get(self.window.getThreadUrl)
                         bMutex.unlock()
                     elif get == 'abnormal':
+                        self.window.currentThreadSenderList.append('unknown')
                         abnormalID.append(i)
                         lastOrder = i
                         lastCurrent = get
