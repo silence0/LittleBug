@@ -182,6 +182,9 @@ class searchClickedThread(QtCore.QThread):
                         bMutex.unlock()
                     elif get == 'abnormal':
                         abnormalID.append(i)
+                        lastOrder = i
+                        lastCurrent = get
+                        break
                     else:
                         #                     说明搜索到了，那么这个信件就不用重新发了
                         self.window.currentThreadSenderList.append(get)
