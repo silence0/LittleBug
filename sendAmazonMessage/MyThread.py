@@ -177,9 +177,9 @@ class searchClickedThread(QtCore.QThread):
                     if get == None:
                         #                 说明没搜索到呀，那么就要给他发信
                         send.sendMessage2(send.generateSendMessageUrl(i), self.window.modelText, self.window.driver, i)
-                        bMutex.lock()
-                        self.window.driver.get(self.window.getThreadUrl)
-                        bMutex.unlock()
+                        # bMutex.lock()
+                        # self.window.driver.get(self.window.getThreadUrl)
+                        # bMutex.unlock()
                     elif get == 'abnormal':
                         self.window.currentThreadSenderList.append('unknown')
                         abnormalID.append(i)
