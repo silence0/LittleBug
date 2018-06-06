@@ -70,18 +70,55 @@ def getlist(driver0):
     return allorderlist, alldatetimelist
 
 
+def getorderinfo(driver0,orderid):
+    orderrow = driver.find_element_by_id("row-"+orderid)
+    orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
+    o1 = orderinfo.text
+    if(str(orderinfo.text)[-3:] == '...'):
+        info_a = orderrow.find_element_by_link_text(orderid)
+        js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
+        handle = driver0.current_window_handle
+        driver0.execute_script(js)
+
+        handles = driver0.window_handles
+        for newhandle in handles:
+
+            # 筛选新打开的窗口B
+
+            if newhandle != handle:
+
+        # 切换到新打开的窗口B
+
+                driver0.switch_to_window(newhandle)
+
+        # 在新打开的窗口B中操作
+        wait.WebDriverWait(driver0, 10000000).until(
+            EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
+        o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+
+        # 关闭当前窗口B
+
+        driver0.close()
+
+        # 切换回窗口A
+
+        driver0.switch_to_window(handles[0])
+
+    return o1
+
+
 # Configurations on Mac
 # url = r'file:///Users/djc/Downloads/4_files/7.html'
-print("start:" + str(time.clock()))
-
-
-if '1111' == 0:
-    print('1111')
-
-
-# url = r'file:///Users/djc/Desktop/spider/Manage%20Orders%20-%20Amazon.html'
-url = r'file:///Users/djc/Desktop/spider/%E7%94%A8%E6%89%80%E9%80%89%E9%A1%B9%E7%9B%AE%E6%96%B0%E5%BB%BA%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B9/succ.html?cs=39426419&fi=RESPONSE_NEEDED'
-excelUrl = r'/Users/djc/Desktop/test1.xls'
+# print("start:" + str(time.clock()))
+#
+#
+# if '1111' == 0:
+#     print('1111')
+#
+#
+# # url = r'file:///Users/djc/Desktop/spider/Manage%20Orders%20-%20Amazon.html'
+# url = r'file:///Users/djc/Desktop/spider/%E7%94%A8%E6%89%80%E9%80%89%E9%A1%B9%E7%9B%AE%E6%96%B0%E5%BB%BA%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B9/succ.html?cs=39426419&fi=RESPONSE_NEEDED'
+# excelUrl = r'/Users/djc/Desktop/test1.xls'
 #
 # driver = webdriver.Chrome('/Users/djc/Downloads/chromedriver')
 # print("chrome ready:" + str(time.clock()))
@@ -178,41 +215,7 @@ excelUrl = r'/Users/djc/Desktop/test1.xls'
 
 
 
-def getorderinfo(driver0,orderid):
-    orderrow = driver.find_element_by_id("row-"+orderid)
-    orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
-    o1 = orderinfo.text
-    if(str(orderinfo.text)[-3:] == '...'):
-        info_a = orderrow.find_element_by_link_text(orderid)
-        js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
-        handle = driver0.current_window_handle
-        driver0.execute_script(js)
 
-        handles = driver0.window_handles
-        for newhandle in handles:
-
-            # 筛选新打开的窗口B
-
-            if newhandle != handle:
-
-        # 切换到新打开的窗口B
-
-                driver0.switch_to_window(newhandle)
-
-        # 在新打开的窗口B中操作
-        wait.WebDriverWait(driver0, 10000000).until(
-            EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
-        o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
-
-        # 关闭当前窗口B
-
-        driver0.close()
-
-        # 切换回窗口A
-
-        driver0.switch_to_window(handles[0])
-
-    return o1
 
 
 # print(getorderinfo(driver, '112-7159011-6004236'))
@@ -221,3 +224,8 @@ def getorderinfo(driver0,orderid):
 
 
 # print(orderlisthtml.text)
+
+a = 0
+a += 1
+a += 1
+print(a)
