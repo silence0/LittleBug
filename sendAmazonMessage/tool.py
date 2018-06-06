@@ -302,12 +302,13 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
             # searchbutton.click()
             # 只有不出现任何问题，才能继续，否则重新来一遍
             bMutex.unlock()
+            break
         except Exception as e:
             bMutex.unlock()
             traceback.print_exc()
-            continue
             print('try again--------------------')
 
+    while True:
         try:
             bMutex.lock()
             idDom = wait.WebDriverWait(driver0, 3).until(
@@ -315,7 +316,6 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
             current = str(idDom.get_attribute('value'))
             bMutex.unlock()
             if current == lastcurrentid:
-
                 try:
                     bMutex.lock()
                     orderidA = wait.WebDriverWait(driver0, 3).until(
@@ -342,13 +342,12 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                     if abnormity > 10:
                         print("Abnormal!!!!!!!!")
                         return 'abnormal'
-
             else:
                 return current
         except Exception as e:
             # traceback.print_exc()
             try:
-                wait.WebDriverWait(driver0, 3).until(
+                wait.WebDriverWait(driver0, 1).until(
                     EC.presence_of_element_located((By.CLASS_NAME, 'click-thread')))
                 bMutex.unlock()
             except Exception as ee:
