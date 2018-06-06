@@ -311,6 +311,7 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
     while True:
         try:
             bMutex.lock()
+            time.sleep(1)
             idDom = wait.WebDriverWait(driver0, 3).until(
                     EC.presence_of_element_located((By.ID, 'currentThreadSenderId')))
             current = str(idDom.get_attribute('value'))
