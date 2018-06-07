@@ -92,7 +92,7 @@ class sendByIDClickedThread(QtCore.QThread):
             self.window.driver = webdriver.Firefox(executable_path=self.window.driverPath,firefox_profile=self.window.profile)
             self.window.setDriver(self.window.driver)
             bMutex.unlock()
-
+            time.sleep(60)
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
             self.window.nameList = []
             allID = self.window.getIDInputWidget().toPlainText()
