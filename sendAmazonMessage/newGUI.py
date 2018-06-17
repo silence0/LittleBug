@@ -6,7 +6,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from selenium import webdriver
 import os.path
-from MyThread import searchClickedThread, sendByIDClickedThread, sendByDateClickedThread, mySingal, testThread
+from MyThread import searchClickedThread, sendByIDClickedThread, sendByDateClickedThread, mySingal, testThread,continueSearchThread
 from VAR import bMutex
 
 class Header(QFrame):
@@ -194,10 +194,12 @@ class LeftPage(QFrame):
         self.sendByDateButton = QRadioButton('SendByDate')
         self.sendByIDButton = QRadioButton('SendByID')
         self.searchButton = QRadioButton('Search')
+        self.continueButton = QRadioButton('Continue')
         self.selectButtonBox = QButtonGroup(self)
         self.selectButtonBox.addButton(self.sendByDateButton, 1)
         self.selectButtonBox.addButton(self.sendByIDButton, 2)
         self.selectButtonBox.addButton(self.searchButton, 3)
+        self.selectButtonBox.addButton(self.continueButton,4)
 
         self.IDInput = QTextEdit(self)
         self.IDInput.setPlaceholderText('Input ID list here')
@@ -213,6 +215,7 @@ class LeftPage(QFrame):
         self.tempHBox.addWidget(self.sendByDateButton)
         self.tempHBox.addWidget(self.sendByIDButton)
         self.tempHBox.addWidget(self.searchButton)
+        self.tempHBox.addWidget(self.continueButton)
 
         self.mainLayout.addLayout(self.tempHBox)
         self.mainLayout.addSpacing(20)
@@ -227,7 +230,6 @@ class LeftPage(QFrame):
         self.mainLayout.addLayout(self.tempH2Box)
         self.mainLayout.addSpacing(20)
 
-        self.sendByDateButton.click()
 
     def initSize(self):
         # self.templateInput.setFixedSize(460,236)
@@ -336,6 +338,8 @@ class LeftPage(QFrame):
             self.workThread = sendByIDClickedThread(self.parent)
         if self.selectButtonBox.checkedId() == 3:
             self.workThread = searchClickedThread(self.parent)
+        if self.selectButtonBox.checkedId() == 4:
+            self.workThread = continueSearchThread(self.parent)
         self.workThread.start()
         self.parentWidget().s.graySignal.emit()
 

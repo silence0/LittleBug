@@ -6,7 +6,9 @@ import send
 import tool
 import traceback
 from VAR import bMutex
-
+import os
+import os.path
+import pickle
 class mySingal(QtCore.QObject):
     graySignal = QtCore.pyqtSignal()
     ungraySignal = QtCore.pyqtSignal()
@@ -143,14 +145,16 @@ class searchClickedThread(QtCore.QThread):
         try:
             bMutex.lock()
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
-            # print(self.window.profilePath)
-            # profile = webdriver.FirefoxProfile(self.window.profilePath)
             self.window.driver = webdriver.Firefox(executable_path=self.window.driverPath,firefox_profile=self.window.profile)
             self.window.setDriver(self.window.driver)
             self.window.driver.get(self.window.selectDateUrl)
             bMutex.unlock()
             time.sleep(3)
             self.window.orderList, self.window.dateList = tool.getlist(self.window.driver)
+            infoFile = open('searchAllDate.temp','wb')
+            pickle.dump(self.window.orderList,infoFile)
+            pickle.dump(self.window.dateList,infoFile)
+            infoFile.close()
             self.window.currentThreadSenderList = []
             self.window.nameList = []
             orderSizeStr = str(len(self.window.orderList))
@@ -161,25 +165,105 @@ class searchClickedThread(QtCore.QThread):
             self.window.driver.get(self.window.getThreadUrl)
             bMutex.unlock()
             time.sleep(3)
-            # allIDText = open('searchAllID.txt','w')
-            # for i in self.window.orderList:
-            #     allIDText.write(i+'\n')
-            # allIDText.close()
-            # t = open('searchSentID.txt','w')
-            # t.close()
+            t = open('searchSentID.txt','w')
+            t.close()
             lastCurrent = 0
             lastOrder = 0
             abnormalID = []
             for i in self.window.orderList:
-                # sendIDText = open('searchSentID.txt', 'a')
+                sendIDText = open('searchSentID.txt', 'a')
                 while True:
                     get = tool.getcurrent2(self.window.driver, i,lastcurrentid=lastCurrent,lastorderid=lastOrder)
                     if get == None:
                         #                 说明没搜索到呀，那么就要给他发信
                         send.sendMessage2(send.generateSendMessageUrl(i), self.window.modelText, self.window.driver, i)
-                        # bMutex.lock()
-                        # self.window.driver.get(self.window.getThreadUrl)
-                        # bMutex.unlock()
+                    elif get == 'abnormal':
+                        self.window.currentThreadSenderList.append('unknown')
+                        abnormalID.append(i)
+                        lastOrder = i
+                        lastCurrent = get
+                        break
+                    else:
+                        #                     说明搜索到了，那么这个信件就不用重新发了
+                        self.window.currentThreadSenderList.append(get)
+                        lastOrder = i
+                        lastCurrent = get
+                        break
+                sendIDText.write(i + '#' + get + '\n')
+                sendIDText.close()
+                self.window.s.addLogItemSignal.emit('Order ID:' + str(i) + '\nCurrentThreadSenderID:' + str(get))
+                completedIndex = completedIndex + 1
+                self.window.s.scheduleSignal.emit(str(completedIndex) + r'/' + orderSizeStr)
+
+            tool.writeExcelAndAbnormalId(self.window.currentThreadSenderList, self.window.orderList, self.window.dateList, abnormalID)
+            self.window.driver.close()
+            os.remove('searchSentID.txt')
+            os.remove('searchAllDate.temp')
+            self.window.s.informationSignal.emit('information', 'completed successfully')
+            self.window.s.ungraySignal.emit()
+        except Exception as e:
+            bMutex.unlock()
+            traceback.print_exc()
+            self.window.s.errorSignal.emit()
+
+class continueSearchThread(QtCore.QThread):
+    def __init__(self,window):
+        super(continueSearchThread, self).__init__(parent=window)
+        self.window = window
+    def run(self):
+        try:
+            bMutex.lock()
+            self.window.modelText = self.window.getModelInputWidget().toPlainText()
+            self.window.driver = webdriver.Firefox(executable_path=self.window.driverPath,
+                                                   firefox_profile=self.window.profile)
+            self.window.setDriver(self.window.driver)
+            self.window.driver.get(self.window.selectDateUrl)
+            bMutex.unlock()
+            with open('searchAllDate.temp','rb') as f:
+                self.window.orderList = pickle.load(f)
+                self.window.dateList = pickle.load(f)
+            lastOrders = []
+            lastCurs = []
+            with open('searchSentID.txt','r') as f:
+                t = f.readline()
+                while True:
+                    if t == '':
+                        break
+                    else:
+                        l = t.split('#')
+                        lastOrders.append(l[0])
+                        lastCurs.append(l[1])
+
+            time.sleep(30)
+            # self.window.orderList, self.window.dateList = tool.getlist(self.window.driver)
+
+            self.window.currentThreadSenderList = []
+            self.window.nameList = []
+            orderSizeStr = str(len(self.window.orderList))
+            self.window.s.scheduleSignal.emit(str(0) + r'/' + orderSizeStr)
+            completedIndex = 0
+            #         拿这些ID去搜索
+            bMutex.lock()
+            self.window.driver.get(self.window.getThreadUrl)
+            bMutex.unlock()
+            time.sleep(3)
+            lastCurrent = 0
+            lastOrder = 0
+            abnormalID = []
+            self.window.currentThreadSenderList.extend(lastCurs)
+            for i,index in zip(self.window.orderList,range(0,len(self.window.orderList))):
+                haveDonw = False
+                if i in lastOrders:
+                    haveDonw =True
+                    get = lastCurs[index]
+                # sendIDText = open('searchSentID.txt', 'a')
+                while True:
+                    if haveDonw == True:
+                        break
+                    get = tool.getcurrent2(self.window.driver, i, lastcurrentid=lastCurrent, lastorderid=lastOrder)
+                    if get == None:
+                        #                 说明没搜索到呀，那么就要给他发信
+                        send.sendMessage2(send.generateSendMessageUrl(i), self.window.modelText, self.window.driver, i)
                     elif get == 'abnormal':
                         self.window.currentThreadSenderList.append('unknown')
                         abnormalID.append(i)
@@ -199,9 +283,11 @@ class searchClickedThread(QtCore.QThread):
                 completedIndex = completedIndex + 1
                 self.window.s.scheduleSignal.emit(str(completedIndex) + r'/' + orderSizeStr)
 
-            tool.writeExcelAndAbnormalId(self.window.currentThreadSenderList, self.window.orderList, self.window.dateList, abnormalID)
+            tool.writeExcelAndAbnormalId(self.window.currentThreadSenderList, self.window.orderList,
+                                         self.window.dateList, abnormalID)
             self.window.driver.close()
-
+            os.remove('searchSentID.txt')
+            os.remove('searchAllDate.temp')
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.ungraySignal.emit()
         except Exception as e:
