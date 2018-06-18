@@ -197,8 +197,11 @@ class searchClickedThread(QtCore.QThread):
 
             tool.writeExcelAndAbnormalId(self.window.currentThreadSenderList, self.window.orderList, self.window.dateList, abnormalID)
             self.window.driver.close()
-            os.remove('searchSentID.txt')
-            os.remove('searchAllDate.temp')
+            try:
+                os.remove('searchSentID.txt')
+                os.remove('searchAllDate.temp')
+            except:
+                pass
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.ungraySignal.emit()
         except Exception as e:
@@ -219,20 +222,24 @@ class continueSearchThread(QtCore.QThread):
             self.window.setDriver(self.window.driver)
             self.window.driver.get(self.window.selectDateUrl)
             bMutex.unlock()
-            with open('searchAllDate.temp','rb') as f:
-                self.window.orderList = pickle.load(f)
-                self.window.dateList = pickle.load(f)
-            lastOrders = []
-            lastCurs = []
-            with open('searchSentID.txt','r') as f:
-                t = f.readline()
-                while True:
-                    if t == '':
-                        break
-                    else:
-                        l = t.split('#')
-                        lastOrders.append(l[0])
-                        lastCurs.append(l[1])
+            try:
+                with open('searchAllDate.temp','rb') as f:
+                    self.window.orderList = pickle.load(f)
+                    self.window.dateList = pickle.load(f)
+                lastOrders = []
+                lastCurs = []
+                with open('searchSentID.txt','r') as f:
+                    while True:
+                        t = f.readline()
+                        if t == '':
+                            break
+                        else:
+                            l = t.split('#')
+                            lastOrders.append(l[0])
+                            lastCurs.append(l[1])
+            except:
+                self.window.s.informationSignal.emit('information', "can't find data files!")
+                return
 
             time.sleep(30)
             # self.window.orderList, self.window.dateList = tool.getlist(self.window.driver)
@@ -286,8 +293,11 @@ class continueSearchThread(QtCore.QThread):
             tool.writeExcelAndAbnormalId(self.window.currentThreadSenderList, self.window.orderList,
                                          self.window.dateList, abnormalID)
             self.window.driver.close()
-            os.remove('searchSentID.txt')
-            os.remove('searchAllDate.temp')
+            try:
+                os.remove('searchSentID.txt')
+                os.remove('searchAllDate.temp')
+            except:
+                pass
             self.window.s.informationSignal.emit('information', 'completed successfully')
             self.window.s.ungraySignal.emit()
         except Exception as e:
