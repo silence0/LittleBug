@@ -6,7 +6,7 @@ import send
 import tool
 import traceback
 from VAR import bMutex
-
+# Qt的信号，用于工作线程和GUI线程间的交互
 class mySingal(QtCore.QObject):
     graySignal = QtCore.pyqtSignal()
     ungraySignal = QtCore.pyqtSignal()
@@ -16,18 +16,7 @@ class mySingal(QtCore.QObject):
     scheduleSignal = QtCore.pyqtSignal(str)
     addLogItemSignal = QtCore.pyqtSignal(str)
 
-
-class testThread(QtCore.QThread):
-    def __init__(self, mainWindow):
-        super(testThread, self).__init__()
-        self.mainWindow = mainWindow
-
-    def run(self):
-        print('run@')
-        # self.mainWindow.s.graySignal.emit()
-        self.mainWindow.s.ungraySignal.emit()
-
-
+# 按照日期发送信件——工作线程
 class sendByDateClickedThread(QtCore.QThread):
     def __init__(self, mainWindow):
         super(sendByDateClickedThread, self).__init__(mainWindow)
@@ -80,7 +69,7 @@ class sendByDateClickedThread(QtCore.QThread):
             traceback.print_exc()
             self.window.s.errorSignal.emit()
 
-
+# 按照ID发送信件——工作线程
 class sendByIDClickedThread(QtCore.QThread):
     def __init__(self, mainwindow):
         super(sendByIDClickedThread, self).__init__(mainwindow)
@@ -133,7 +122,7 @@ class sendByIDClickedThread(QtCore.QThread):
             traceback.print_exc()
             self.window.s.errorSignal.emit()
 
-
+# 搜索并生成表格——工作线程
 class searchClickedThread(QtCore.QThread):
     def __init__(self, mainwindow):
         super(searchClickedThread, self).__init__(parent=mainwindow)
@@ -143,8 +132,6 @@ class searchClickedThread(QtCore.QThread):
         try:
             bMutex.lock()
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
-            # print(self.window.profilePath)
-            # profile = webdriver.FirefoxProfile(self.window.profilePath)
             self.window.driver = webdriver.Firefox(executable_path=self.window.driverPath,firefox_profile=self.window.profile)
             self.window.setDriver(self.window.driver)
             self.window.driver.get(self.window.selectDateUrl)
@@ -161,25 +148,15 @@ class searchClickedThread(QtCore.QThread):
             self.window.driver.get(self.window.getThreadUrl)
             bMutex.unlock()
             time.sleep(3)
-            # allIDText = open('searchAllID.txt','w')
-            # for i in self.window.orderList:
-            #     allIDText.write(i+'\n')
-            # allIDText.close()
-            # t = open('searchSentID.txt','w')
-            # t.close()
             lastCurrent = 0
             lastOrder = 0
             abnormalID = []
             for i in self.window.orderList:
-                # sendIDText = open('searchSentID.txt', 'a')
                 while True:
                     get = tool.getcurrent2(self.window.driver, i,lastcurrentid=lastCurrent,lastorderid=lastOrder)
                     if get == None:
-                        #                 说明没搜索到呀，那么就要给他发信
+                        #                 说明没搜索到，那么就要给他发信
                         send.sendMessage2(send.generateSendMessageUrl(i), self.window.modelText, self.window.driver, i)
-                        # bMutex.lock()
-                        # self.window.driver.get(self.window.getThreadUrl)
-                        # bMutex.unlock()
                     elif get == 'abnormal':
                         self.window.currentThreadSenderList.append('unknown')
                         abnormalID.append(i)
@@ -189,8 +166,6 @@ class searchClickedThread(QtCore.QThread):
                     else:
                         #                     说明搜索到了，那么这个信件就不用重新发了
                         self.window.currentThreadSenderList.append(get)
-                        # sendIDText.write(i+'     '+get+'\n')
-                        # sendIDText.close()
                         lastOrder = i
                         lastCurrent = get
                         break

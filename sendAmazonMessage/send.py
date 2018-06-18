@@ -11,10 +11,13 @@ import os.path
 from boltons import iterutils
 from VAR import bMutex
 import re
+# 用于生成，给特定的人发送信件时需要打开的网页地址
 def generateSendMessageUrl(orderID):
     ori = r'https://sellercentral.amazon.com/gp/help/contact/contact.html?orderID=%s&marketplaceID=ATVPDKIKX0DER'%(orderID)
     return ori
+# 不使用标签进行发信(在单纯使用发信功能时调用,因为从始至终只需要在一个页面内)
 def sendMessage(sendMessageUrl, modelStr, driver,orderid):
+    # 循环的目的是为了在发生未知错误时,能够重新进行一次
     while True:
         try:
             # 选择subject为order Infomation
@@ -59,12 +62,6 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             bMutex.unlock()
             time.sleep(1)
 
-            # chunkModel = iterutils.chunked(modelStr,100)
-            # for i in chunkModel:
-            #     textArea.send_keys(i)
-
-
-            # textArea.send_keys(modelStr)
 
             # 点击发送邮件按钮
             bMutex.lock()
@@ -84,7 +81,7 @@ def sendMessage(sendMessageUrl, modelStr, driver,orderid):
             traceback.print_exc()
             print('try send again----------------------')
 
-
+# 使用标签来进行发信(在使用搜索功能时,为了提高速度,查找信件的那个页面不关闭,故在新标签内发信)
 def sendMessage2(sendMessageUrl, modelStr, driver,orderid):
     while True:
         try:
@@ -146,12 +143,6 @@ def sendMessage2(sendMessageUrl, modelStr, driver,orderid):
             bMutex.unlock()
             time.sleep(1)
 
-            # chunkModel = iterutils.chunked(modelStr,100)
-            # for i in chunkModel:
-            #     textArea.send_keys(i)
-
-
-            # textArea.send_keys(modelStr)
 
             # 点击发送邮件按钮
             bMutex.lock()
