@@ -38,7 +38,8 @@ def getorderinfo(driver0, orderid):
         # 在新打开的窗口B中操作
         wait.WebDriverWait(driver0, 10000000).until(
             EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
-        o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+        # o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+        o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.co.jp/gp/product/')]").text
 
         # 关闭当前窗口B
 
@@ -53,7 +54,9 @@ def getorderinfo(driver0, orderid):
 
 def getorderinfo2(driver0, orderid):
     bMutex.lock()
-    js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
+    # js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
+    js = 'window.open(\"https://sellercentral.amazon.co.jp/hz/orders/details?_encoding=UTF8&orderId=' + orderid + '\");'
+
     handle = driver0.current_window_handle
     driver0.execute_script(js)
 
@@ -70,8 +73,8 @@ def getorderinfo2(driver0, orderid):
     # 在新打开的窗口B中操作
     wait.WebDriverWait(driver0, 10000000).until(
         EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
-    o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
-
+    # o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+    o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.co.jp/gp/product/')]").text
     # 关闭当前窗口B
 
     driver0.close()
@@ -84,7 +87,8 @@ def getorderinfo2(driver0, orderid):
 
 def getorderinfo3(driver0, orderid):
     bMutex.lock()
-    js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
+    # js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
+    js = 'window.open(\"https://sellercentral.amazon.co.jp/hz/orders/details?_encoding=UTF8&orderId=' + orderid + '\");'
     handle = driver0.current_window_handle
     driver0.execute_script(js)
 
@@ -101,8 +105,8 @@ def getorderinfo3(driver0, orderid):
     # 在新打开的窗口B中操作
     wait.WebDriverWait(driver0, 10000000).until(
         EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
-    o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
-
+    # o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
+    o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.co.jp/gp/product/')]").text
     # 关闭当前窗口B
 
     driver0.close()
