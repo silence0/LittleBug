@@ -12,7 +12,7 @@ from boltons import iterutils
 from VAR import bMutex
 import re
 def generateSendMessageUrl(orderID):
-    ori = r'https://sellercentral.amazon.com/gp/help/contact/contact.html?orderID=%s&marketplaceID=ATVPDKIKX0DER'%(orderID)
+    ori = r'https://sellercentral.amazon.co.jp/gp/help/contact/contact.html?orderID=%s&marketplaceID=A1VC38T7YXB528'%(orderID)
     return ori
 def sendMessage(sendMessageUrl, modelStr, driver,orderid):
     while True:
