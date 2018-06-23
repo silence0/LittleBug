@@ -93,6 +93,7 @@ class sendByIDClickedThread(QtCore.QThread):
             bMutex.lock()
             self.window.driver = webdriver.Firefox(executable_path=self.window.driverPath,firefox_profile=self.window.profile)
             self.window.setDriver(self.window.driver)
+            self.window.driver.get(self.window.selectDateUrl)
             bMutex.unlock()
             time.sleep(60)
             self.window.modelText = self.window.getModelInputWidget().toPlainText()
@@ -259,6 +260,7 @@ class continueSearchThread(QtCore.QThread):
             abnormalID = []
             self.window.currentThreadSenderList.extend(lastCurs)
             for i,index in zip(self.window.orderList,range(0,len(self.window.orderList))):
+                sendIDText = open('searchSentID.txt', 'a')
                 haveDonw = False
                 if i in lastOrders:
                     haveDonw =True
@@ -285,7 +287,9 @@ class continueSearchThread(QtCore.QThread):
                         lastOrder = i
                         lastCurrent = get
                         break
-
+                if haveDonw == False:
+                    sendIDText.write(i + '#' + get + '\n')
+                    sendIDText.close()
                 self.window.s.addLogItemSignal.emit('Order ID:' + str(i) + '\nCurrentThreadSenderID:' + str(get))
                 completedIndex = completedIndex + 1
                 self.window.s.scheduleSignal.emit(str(completedIndex) + r'/' + orderSizeStr)
