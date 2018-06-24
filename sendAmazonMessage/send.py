@@ -12,6 +12,7 @@ from boltons import iterutils
 from VAR import bMutex
 import re
 # 用于生成，给特定的人发送信件时需要打开的网页地址
+# 发信的网址
 def generateSendMessageUrl(orderID):
     ori = r'https://sellercentral.amazon.com/gp/help/contact/contact.html?orderID=%s&marketplaceID=ATVPDKIKX0DER'%(orderID)
     return ori

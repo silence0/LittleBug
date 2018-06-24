@@ -113,13 +113,6 @@ def getlist(driver0):
                     bMutex.lock()
                     pagefulltr = driver0.find_element_by_xpath("//div[@id='myo-table']/table/tbody/tr[1]")
                     bMutex.unlock()
-                    # pattern11 = re.compile(r'Orders \d+ to \d+')
-                    # pagefulltext = re.findall(pattern11, pagefulltr.text)
-                    # pagetext = str(pagefulltext[0])
-                    # maxnum = pagetext.split()[-1]
-                    # print("pagenumberget:" + str(time.clock()))
-                    # bMutex.unlock()
-                    # if int(maxnum) <= 100:
                     if 'of' not in pagefulltr.text:
                         onepageflag = 1
                         print('onegage!')
@@ -151,35 +144,16 @@ def getlist(driver0):
                         continue
                     orderlist.append(orderid)
                     datetd = i.find_element_by_xpath("./td[2]")
-                    # print(datetd.text)
                     thisdate = str(datetd.text).split('\n')
                     datelist.append(thisdate[0])
                     timelist.append(thisdate[1][:-4])
-                # pattern = re.compile(r'\d{3}-\d{7}-\d{7}')
-                # orderlist = re.findall(pattern, orderlisthtml.text)
-
-                # orderinfolist = []
                 print("allorderget:" + str(time.clock()))
 
-                # for i in orderlist:
-                #     currentordertable = driver0.find_element_by_id('row-' + i)
-                #     pattern1 = re.compile(r'\w{3} \d{1,2}, \d{4}')
-                #     thisdate = re.findall(pattern1, currentordertable.text)
-                #     datelist.append(thisdate[0])
-                #
-                #     pattern2 = re.compile(r'\d+:\d+:\d+ \w\w')
-                #     thistime = re.findall(pattern2, currentordertable.text)
-                #     timelist.append(thistime[0])
-                #
-                # orderinfolist.append(getorderinfo(driver0,i))
                 bMutex.unlock()
                 #     把这一页的信息加入
                 allorderlist.extend(orderlist)
                 print("alldateget:" + str(time.clock()))
-                # print(orderinfolist)
-                # allorderinfolist.extend(orderinfolist)
                 for i, j in zip(datelist, timelist):
-                    # print('test:    '+i+'    '+j)
                     thisdatetime = datetime.strptime(i + ' ' + j, "%b %d, %Y %I:%M:%S %p")
                     alldatetimelist.append(thisdatetime)
                 #     信息加入成功，那么可以离开这一页的try循环
@@ -220,11 +194,8 @@ def getcurrent(driver0, orderid):
                 EC.presence_of_element_located((By.ID, 'search-text-box')))
             idinput = driver0.find_element_by_id("search-text-box")
             searchbutton = driver0.find_element_by_name("Search")
-            # idinput.clear()
-            # idinput.send_keys(orderid)
             driver0.execute_script("arguments[0].value=" + "'" + orderid + "'", idinput)
             driver0.execute_script('arguments[0].click();', searchbutton)
-            # searchbutton.click()
             # 只有不出现任何问题，才能继续，否则重新来一遍
             bMutex.unlock()
             break
@@ -243,8 +214,6 @@ def getcurrent(driver0, orderid):
         bMutex.unlock()
         return current
     except Exception as e:
-        # traceback.print_exc()
-
         bMutex.unlock()
         print('No result found, ready to send message')
         return None
@@ -259,8 +228,6 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 EC.presence_of_element_located((By.ID, 'search-text-box')))
             idinput = driver0.find_element_by_id("search-text-box")
             searchbutton = driver0.find_element_by_name("Search")
-            # idinput.clear()
-            # idinput.send_keys(orderid)
             driver0.execute_script("arguments[0].value=" + "'" + orderid + "'", idinput)
             driver0.execute_script('arguments[0].click();', searchbutton)
             # searchbutton.click()
@@ -338,7 +305,6 @@ def writeExcelAndAbnormalId(current, order, dateList,abnormalIdList):
     # sheet.write(0, 2, 'buyerName')
     sheet.write(0, 2, 'buyerDate')
     n = 1
-    # for i, j, k, t in zip(current, order, name, date):
     for i, j, k in zip(current, order, dateList):
         sheet.write(n, 0, i)
         sheet.write(n, 1, j)
