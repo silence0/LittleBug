@@ -14,43 +14,7 @@ from VAR import bMutex
 
 # 获取所有的打开页面的orderlist 和 datetimelist，但是检索要自己进行
 
-
-def getorderinfo(driver0, orderid):
-    bMutex.lock()
-    orderrow = driver0.find_element_by_id("row-" + orderid)
-    orderinfo = orderrow.find_element_by_xpath("//span[contains(@id,'___product')]")
-    o1 = orderinfo.text
-    if (str(orderinfo.text)[-3:] == '...'):
-        info_a = orderrow.find_element_by_link_text(orderid)
-        js = 'window.open(\"' + info_a.get_attribute('href') + '\");'
-        handle = driver0.current_window_handle
-        driver0.execute_script(js)
-        handles = driver0.window_handles
-        for newhandle in handles:
-
-            # 筛选新打开的窗口B
-
-            if newhandle != handle:
-                # 切换到新打开的窗口B
-
-                driver0.switch_to_window(newhandle)
-
-        # 在新打开的窗口B中操作
-        wait.WebDriverWait(driver0, 10000000).until(
-            EC.presence_of_element_located((By.ID, 'myo-order-details-item-product-details')))
-        o1 = driver0.find_element_by_xpath("//a[contains(@href,'https://www.amazon.com/gp/product/')]").text
-
-        # 关闭当前窗口B
-
-        driver0.close()
-
-        # 切换回窗口A
-
-        driver0.switch_to_window(handles[0])
-    bMutex.unlock()
-    return o1
-
-
+# 两个方法实现的同一个功能,即获取订单的详情
 def getorderinfo2(driver0, orderid):
     bMutex.lock()
     js = 'window.open(\"https://sellercentral.amazon.com/gp/orders-v2/details?orderID=' + orderid + '\");'
@@ -113,7 +77,7 @@ def getorderinfo3(driver0, orderid):
     bMutex.unlock()
     return o1
 
-
+# 获取订单号
 def getlist(driver0):
     allorderlist = []
     alldatetimelist = []
@@ -246,7 +210,7 @@ def getlist(driver0):
     return allorderlist, alldatetimelist
 
 
-# 尝试获取currentThreadSenderID，如果获取失败，那么返回的是none
+# 尝试获取currentThreadSenderID，如果获取失败，那么返回的是none(原来的实现方法,已废弃)
 def getcurrent(driver0, orderid):
     while True:
         try:
@@ -285,7 +249,7 @@ def getcurrent(driver0, orderid):
         print('No result found, ready to send message')
         return None
 
-
+# 更快的获取currentthreadsendid的函数,通过进行比较来加快速度并提高准确度
 def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
     abnormity = 0
     while True:
@@ -356,18 +320,8 @@ def getcurrent2(driver0, orderid,lastcurrentid,lastorderid):
                 print('No result found, ready to send message')
                 return None
 
-
+    # 搜索功能结束成功,生成表格及异常信息文件
 def writeExcelAndAbnormalId(current, order, dateList,abnormalIdList):
-    # excelname = str(month) + '-' + str(day) + 'to' + str(month2) + '-' + str(day2) + '.xls'
-    # excelName = 'result.xls'
-    # try:
-    #     firstDay = dateList[0]
-    #     lastDay = dateList[-1]
-    #     assert isinstance(firstDay,datetime)
-    #     assert isinstance(lastDay,datetime)
-    #     excelName = str(firstDay.month)+'-'+str(firstDay.day)+'To'+\
-    #                 str(lastDay.month)+'-'+str(lastDay.day)+'.xls'
-    # except:
     now = datetime.now()
     startDate = dateList[-1]
     endDate = dateList[0]

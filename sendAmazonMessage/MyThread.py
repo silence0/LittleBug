@@ -9,6 +9,7 @@ from VAR import bMutex
 import os
 import os.path
 import pickle
+# Qt的信号，用于工作线程和GUI线程间的交互
 class mySingal(QtCore.QObject):
     graySignal = QtCore.pyqtSignal()
     ungraySignal = QtCore.pyqtSignal()
@@ -18,18 +19,7 @@ class mySingal(QtCore.QObject):
     scheduleSignal = QtCore.pyqtSignal(str)
     addLogItemSignal = QtCore.pyqtSignal(str)
 
-
-class testThread(QtCore.QThread):
-    def __init__(self, mainWindow):
-        super(testThread, self).__init__()
-        self.mainWindow = mainWindow
-
-    def run(self):
-        print('run@')
-        # self.mainWindow.s.graySignal.emit()
-        self.mainWindow.s.ungraySignal.emit()
-
-
+# 按照日期发送信件——工作线程
 class sendByDateClickedThread(QtCore.QThread):
     def __init__(self, mainWindow):
         super(sendByDateClickedThread, self).__init__(mainWindow)
@@ -82,7 +72,7 @@ class sendByDateClickedThread(QtCore.QThread):
             traceback.print_exc()
             self.window.s.errorSignal.emit()
 
-
+# 按照ID发送信件——工作线程
 class sendByIDClickedThread(QtCore.QThread):
     def __init__(self, mainwindow):
         super(sendByIDClickedThread, self).__init__(mainwindow)
@@ -135,7 +125,7 @@ class sendByIDClickedThread(QtCore.QThread):
             traceback.print_exc()
             self.window.s.errorSignal.emit()
 
-
+# 搜索并生成表格——工作线程
 class searchClickedThread(QtCore.QThread):
     def __init__(self, mainwindow):
         super(searchClickedThread, self).__init__(parent=mainwindow)
@@ -175,7 +165,7 @@ class searchClickedThread(QtCore.QThread):
                 while True:
                     get = tool.getcurrent2(self.window.driver, i,lastcurrentid=lastCurrent,lastorderid=lastOrder)
                     if get == None:
-                        #                 说明没搜索到呀，那么就要给他发信
+                        #                 说明没搜索到，那么就要给他发信
                         send.sendMessage2(send.generateSendMessageUrl(i), self.window.modelText, self.window.driver, i)
                     elif get == 'abnormal':
                         self.window.currentThreadSenderList.append('unknown')
@@ -280,8 +270,6 @@ class continueSearchThread(QtCore.QThread):
                     else:
                         #                     说明搜索到了，那么这个信件就不用重新发了
                         self.window.currentThreadSenderList.append(get)
-                        # sendIDText.write(i+'     '+get+'\n')
-                        # sendIDText.close()
                         lastOrder = i
                         lastCurrent = get
                         break
