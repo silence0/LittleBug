@@ -6,7 +6,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from selenium import webdriver
 import os.path
-from MyThread import searchClickedThread, sendByIDClickedThread, sendByDateClickedThread, mySingal
+from MyThread import searchClickedThread, sendByIDClickedThread, sendByDateClickedThread, mySingal,continueSearchThread
 from VAR import bMutex
 # 本文件是对用户界面进行绘制
 class Header(QFrame):
